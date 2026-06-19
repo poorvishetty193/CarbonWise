@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, PlusSquare, BarChart3, Trophy, User } from 'lucide-react';
+import { Home, PlusSquare, BarChart3, Trophy, User, LogOut } from 'lucide-react';
+import { logout } from '../../lib/logout';
 
 /**
  * MobileNav layout component displaying the bottom navigation bar on mobile screens.
@@ -43,7 +44,19 @@ export function MobileNav(): React.ReactElement {
             </Link>
           );
         })}
+
+        {/* Logout button */}
+        <button
+          id="mobile-logout-btn"
+          onClick={() => void logout()}
+          aria-label="Log out"
+          className="flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-red-400 hover:text-red-600"
+        >
+          <LogOut className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px] tracking-tight">Log Out</span>
+        </button>
       </div>
     </nav>
   );
 }
+

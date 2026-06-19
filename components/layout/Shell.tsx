@@ -3,9 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, PlusSquare, BarChart3, Trophy, User, MessageCircle, X } from 'lucide-react';
+import { Home, PlusSquare, BarChart3, Trophy, User, MessageCircle, X, LogOut } from 'lucide-react';
 import { MobileNav } from './MobileNav';
 import { SkipToContent } from './SkipToContent';
+import { useAuthSession } from '../../lib/auth-context';
+import { logout } from '../../lib/logout';
+import { useIdleTimeout } from '../../hooks/useIdleTimeout';
 
 interface ShellProps {
   children: React.ReactNode;
@@ -22,9 +25,13 @@ interface ShellProps {
  */
 export function Shell({ children }: ShellProps): React.ReactElement {
   const pathname = usePathname();
+  const { uid, displayName } = useAuthSession();
   const [isWhispererOpen, setIsWhispererOpen] = useState(false);
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiLoading, setAiLoading] = useState(false);
+
+  // Auto-logout after 10 minutes of inactivity
+  useIdleTimeout(10 * 60 * 1000, !!uid);
 
   const navLinks = [
     { href: '/', label: 'Overview', icon: Home },
@@ -98,8 +105,8 @@ export function Shell({ children }: ShellProps): React.ReactElement {
       {/* Sidebar & Main Area wrapper */}
       <div className="flex flex-1 relative">
         {/* Desktop Sidebar */}
-        <aside className="hidden md:flex flex-col w-64 bg-white border-r border-surface-border p-4 space-y-6">
-          <nav className="space-y-1">
+        <aside className="hidden md:flex flex-col w-64 bg-white border-r border-surface-border p-4">
+          <nav className="space-y-1 flex-1">
             {navLinks.map(({ href, label, icon: Icon }) => {
               const isActive = pathname === href;
               return (
@@ -118,6 +125,25 @@ export function Shell({ children }: ShellProps): React.ReactElement {
               );
             })}
           </nav>
+
+          {/* Sidebar footer: user info + logout */}
+          <div className="mt-auto pt-4 border-t border-surface-border space-y-3">
+            {displayName && (
+              <div className="px-4 py-2">
+                <p className="text-xs text-slateBlue-400 font-sans">Signed in as</p>
+                <p className="text-sm font-semibold text-slateBlue-800 truncate">{displayName}</p>
+              </div>
+            )}
+            <button
+              id="sidebar-logout-btn"
+              onClick={() => void logout()}
+              className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+              aria-label="Log out"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Log Out</span>
+            </button>
+          </div>
         </aside>
 
         {/* Main Content Area */}

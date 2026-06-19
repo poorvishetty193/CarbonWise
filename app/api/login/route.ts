@@ -10,7 +10,6 @@ const COOKIE_NAME = 'AuthToken';
  * Verifies a Firebase ID token and sets a secure HttpOnly session cookie.
  * @param req - NextRequest with Authorization: Bearer <idToken> header
  * @returns 200 on success, 401 on invalid token, 500 on internal error
- * @throws 401 if Authorization header is missing or token is invalid
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const ip = req.headers.get('x-forwarded-for') || 'anonymous';
@@ -20,6 +19,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       headers: { 'Retry-After': '60' },
     });
   }
+
   const authHeader = req.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Missing Authorization header' }, { status: 401 });
