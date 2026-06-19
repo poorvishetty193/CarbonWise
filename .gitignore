@@ -1,0 +1,33 @@
+# Environment — NEVER commit these
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Firebase service account key files
+*-service-account.json
+firebase-adminsdk-*.json
+serviceAccountKey.json
+
+# Build outputs
+.next/
+out/
+dist/
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# Dependencies
+node_modules/
+
+# Coverage
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/settings.json
