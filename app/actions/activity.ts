@@ -98,13 +98,22 @@ export async function logActivity(formData: {
       }
     }
 
+    const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+    const weekId = format(weekStart, "yyyy-'W'ww");
+    const leaderboardRef = getAdminDb().collection('leaderboard').doc(weekId).collection('entries').doc(sanitized.uid);
+
     await getAdminDb().runTransaction(async (transaction) => {
+      // --- ALL READS FIRST ---
       const userDoc = await transaction.get(userRef);
-      if (!userDoc.exists) {
-        throw new Error('User profile does not exist.');
+      const leaderboardDoc = await transaction.get(leaderboardRef);
+
+      // --- PROCESS LOGIC ---
+      let userData: any = {};
+      
+      if (userDoc.exists) {
+        userData = userDoc.data();
       }
 
-      const userData = userDoc.data();
       const currentStreak = userData?.streakDays || 0;
       const currentSaved = userData?.totalKgSaved || 0;
       const lastLoggedDate = userData?.lastLoggedDate || '';
@@ -175,15 +184,21 @@ export async function logActivity(formData: {
         badges
       };
 
+      // --- ALL WRITES ---
       const newDocRef = dbRef.doc();
       transaction.set(newDocRef, activityDoc);
-      transaction.update(userRef, updatePayload);
+      
+      if (userDoc.exists) {
+        transaction.update(userRef, updatePayload);
+      } else {
+        transaction.set(userRef, {
+          ...updatePayload,
+          weeklyBudgetKg: 150, // default budget
+          createdAt: new Date().toISOString()
+        });
+      }
 
       // 4. Update Weekly Leaderboard entry
-      const weekStart = startOfWeek(today, { weekStartsOn: 1 });
-      const weekId = format(weekStart, "yyyy-'W'ww");
-      const leaderboardRef = getAdminDb().collection('leaderboard').doc(weekId).collection('entries').doc(sanitized.uid);
-      const leaderboardDoc = await transaction.get(leaderboardRef);
       const weeklySavedBefore = leaderboardDoc.exists ? (leaderboardDoc.data()?.weeklyKgSaved || 0) : 0;
       const newWeeklySaved = Number((weeklySavedBefore + emissions).toFixed(2));
       transaction.set(leaderboardRef, {
@@ -217,6 +232,7 @@ export async function deleteActivity(id: string, uid: string): Promise<{ success
 
   try {
     await getAdminDb().runTransaction(async (transaction) => {
+      // --- ALL READS FIRST ---
       const actDoc = await transaction.get(actRef);
       if (!actDoc.exists) {
         throw new Error('Activity log not found.');
@@ -227,8 +243,17 @@ export async function deleteActivity(id: string, uid: string): Promise<{ success
         throw new Error('Unauthorized');
       }
 
-      const emissions = data.valueKg || 0;
       const userDoc = await transaction.get(userRef);
+
+      const loggedAt = data.loggedAt;
+      const loggedAtDate = new Date(loggedAt);
+      const weekStart = startOfWeek(loggedAtDate, { weekStartsOn: 1 });
+      const weekId = format(weekStart, "yyyy-'W'ww");
+      const leaderboardRef = getAdminDb().collection('leaderboard').doc(weekId).collection('entries').doc(uid);
+      const leaderboardDoc = await transaction.get(leaderboardRef);
+
+      // --- ALL WRITES ---
+      const emissions = data.valueKg || 0;
       if (userDoc.exists) {
         const currentSaved = userDoc.data()?.totalKgSaved || 0;
         transaction.update(userRef, {
@@ -239,12 +264,6 @@ export async function deleteActivity(id: string, uid: string): Promise<{ success
       transaction.delete(actRef);
 
       // Update Weekly Leaderboard entry (subtracting deleted emissions)
-      const loggedAt = data.loggedAt;
-      const loggedAtDate = new Date(loggedAt);
-      const weekStart = startOfWeek(loggedAtDate, { weekStartsOn: 1 });
-      const weekId = format(weekStart, "yyyy-'W'ww");
-      const leaderboardRef = getAdminDb().collection('leaderboard').doc(weekId).collection('entries').doc(uid);
-      const leaderboardDoc = await transaction.get(leaderboardRef);
       if (leaderboardDoc.exists) {
         const weeklySavedBefore = leaderboardDoc.data()?.weeklyKgSaved || 0;
         const newWeeklySaved = Math.max(0, Number((weeklySavedBefore - emissions).toFixed(2)));

@@ -35,9 +35,13 @@ export function DashboardHomeClient(): React.ReactElement {
 
   const { profile, loading: streakLoading } = useUserStreak(uid ?? undefined);
   const weeklyBudget = profile?.weeklyBudgetKg ?? 150;
-  const { dailyTotal, weeklyTotal, isDailyOver } = useCarbonBudget(uid ?? undefined, weeklyBudget);
-  const { activities, loading: activityLoading } = useActivityLog(uid ?? undefined);
-  const { announcement } = useRealtimeScore(uid ?? undefined);
+  
+  // Fetch activities ONCE for the dashboard (limit to recent 100 to avoid unbounded growth)
+  const { activities, loading: activityLoading } = useActivityLog(uid ?? undefined, 100);
+  
+  // Pass activities to derived hooks instead of creating duplicate listeners
+  const { dailyTotal, weeklyTotal, isDailyOver } = useCarbonBudget(activities, activityLoading, weeklyBudget);
+  const { announcement } = useRealtimeScore(activities, activityLoading);
 
   const loading = streakLoading || activityLoading;
 

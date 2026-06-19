@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
-import { useActivityLog } from './useActivityLog';
+import { ActivityLog } from '../types';
 import { startOfDay, startOfWeek, isAfter } from 'date-fns';
 
 /**
  * React hook that aggregates emissions from activities and tracks user status
  * against daily and weekly carbon budget limits.
  * 
- * @param uid - The Firebase User ID of the user. If undefined, budget calculations will return defaults.
+ * @param activities - The array of activities fetched by the parent component.
+ * @param loading - The loading state from the parent fetch.
  * @param weeklyBudget - The budget limit in kg CO2e configured for this user.
  * @returns Object holding daily total, weekly total, daily over budget status, weekly over budget status, and loading state.
  * @throws {never} This hook does not throw errors.
  */
 export function useCarbonBudget(
-  uid: string | undefined,
+  activities: ActivityLog[],
+  loading: boolean,
   weeklyBudget: number
 ): {
   dailyTotal: number;
@@ -21,7 +23,6 @@ export function useCarbonBudget(
   isWeeklyOver: boolean;
   loading: boolean;
 } {
-  const { activities, loading } = useActivityLog(uid);
   const [dailyTotal, setDailyTotal] = useState(0);
   const [weeklyTotal, setWeeklyTotal] = useState(0);
   const [isDailyOver, setIsDailyOver] = useState(false);

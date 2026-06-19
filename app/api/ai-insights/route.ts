@@ -2,7 +2,36 @@ import { NextRequest } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { isRateLimited } from '../../../lib/rate-limit';
 
-export const runtime = 'edge';
+function getMockStreamResponse(): Response {
+  const encoder = new TextEncoder();
+  const mockInsights = [
+    '*(Note: The AI API quota was exceeded, so here is a mock response!)*\n\n',
+    '### Weekly Carbon Diagnostics\n\n',
+    'Your highest footprint was in the **Transport** category.\n\n',
+    '### Actionable 3-Step Reduction Plan:\n',
+    '1. **Public Rail Shift**: Commuting via rail instead of gasoline cars cuts carbon output by up to 80% per trip.\n',
+    '2. **Alternative Food Choices**: Opting for vegetarian options on Wednesdays lowers kitchen emissions by roughly 12 kg CO₂e.\n',
+    '3. **Solar/Utility Optimisation**: Charging EVs during daylight hours aligns charging patterns with clean grid peaks.',
+  ];
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      for (const chunk of mockInsights) {
+        controller.enqueue(encoder.encode(chunk));
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  });
+}
 
 /**
  * POST handler for `/api/ai-insights`.
@@ -32,33 +61,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       // Mock streamer for dev/demo mode — no API key required
-      const encoder = new TextEncoder();
-      const mockInsights = [
-        '### Weekly Carbon Diagnostics\n\n',
-        'Your highest footprint was in the **Transport** category.\n\n',
-        '### Actionable 3-Step Reduction Plan:\n',
-        '1. **Public Rail Shift**: Commuting via rail instead of gasoline cars cuts carbon output by up to 80% per trip.\n',
-        '2. **Alternative Food Choices**: Opting for vegetarian options on Wednesdays lowers kitchen emissions by roughly 12 kg CO₂e.\n',
-        '3. **Solar/Utility Optimisation**: Charging EVs during daylight hours aligns charging patterns with clean grid peaks.',
-      ];
-
-      const stream = new ReadableStream({
-        async start(controller) {
-          for (const chunk of mockInsights) {
-            controller.enqueue(encoder.encode(chunk));
-            await new Promise((resolve) => setTimeout(resolve, 200));
-          }
-          controller.close();
-        },
-      });
-
-      return new Response(stream, {
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-        },
-      });
+      return getMockStreamResponse();
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -94,7 +97,14 @@ export async function POST(req: NextRequest): Promise<Response> {
         'Connection': 'keep-alive',
       },
     });
-  } catch (error: unknown) {
+  } catch (error: any) {
+    console.error('[AI Insights API] Error generating content:', error);
+    
+    // Fallback to mock stream if we hit Google's 429 quota limits
+    if (error?.status === 429 || error?.message?.includes('429')) {
+      return getMockStreamResponse();
+    }
+
     const message = error instanceof Error ? error.message : 'Internal server error';
     return new Response(JSON.stringify({ error: message }), {
       status: 500,

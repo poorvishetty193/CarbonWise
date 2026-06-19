@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useActivityLog } from './useActivityLog';
+import { ActivityLog } from '../types';
 import { startOfDay, isAfter } from 'date-fns';
 
 /**
  * React hook that derives a real-time carbon score representing today's cumulative emissions,
  * and maintains an screen-reader friendly announcement message for accessibility compliance.
  * 
- * @param uid - The Firebase User ID of the user. If undefined, tracking is skipped.
+ * @param activities - The array of activities fetched by the parent component.
+ * @param loading - The loading state from the parent fetch.
  * @returns Object holding today's carbon score, screen reader announcement, and loading state.
  * @throws {never} This hook does not throw errors.
  */
-export function useRealtimeScore(uid: string | undefined): {
+export function useRealtimeScore(
+  activities: ActivityLog[],
+  loading: boolean
+): {
   todayScore: number;
   announcement: string;
   loading: boolean;
 } {
-  const { activities, loading } = useActivityLog(uid);
   const [todayScore, setTodayScore] = useState(0);
   const [announcement, setAnnouncement] = useState('');
 

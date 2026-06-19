@@ -16,6 +16,8 @@ import { useAuthSession } from '../../lib/auth-context';
 import { CATEGORY_COLORS } from '../../lib/constants';
 import type { ActivityCategory } from '../../types';
 
+import ReactMarkdown from 'react-markdown';
+
 /**
  * InsightsClient renders the client-side stateful AI Climate Insights view.
  * Streams personalized carbon reduction advice based on logged activities.
@@ -90,6 +92,9 @@ export function InsightsClient(): React.ReactElement {
 
   /** Category breakdown for the summary pills. */
   const categoryEntries = Object.entries(activitySummary) as [ActivityCategory, number][];
+  const totalWeeklyEmissions = categoryEntries.reduce((sum, [, kg]) => sum + kg, 0);
+  const weeklyBudget = profile?.weeklyBudgetKg ?? 150;
+  const kgSavedThisWeek = Math.max(0, weeklyBudget - totalWeeklyEmissions);
 
   if (pageLoading) {
     return (
@@ -152,7 +157,7 @@ export function InsightsClient(): React.ReactElement {
         {/* ── Impact Cinema ── */}
         <section aria-labelledby="cinema-title">
           <h2 id="cinema-title" className="sr-only">Impact Cinema</h2>
-          <ImpactGlobe kgSaved={profile?.totalKgSaved ?? 0} />
+          <ImpactGlobe kgSaved={kgSavedThisWeek} />
         </section>
 
         {/* ── Streaming AI text ── */}
@@ -164,7 +169,7 @@ export function InsightsClient(): React.ReactElement {
             </Button>
           </div>
 
-          <div className="flex-1 text-slateBlue-800 leading-relaxed text-sm whitespace-pre-line overflow-y-auto scrollbar-hide">
+          <div className="flex-1 text-slateBlue-800 leading-relaxed text-sm overflow-y-auto scrollbar-hide">
             {loading && !streamedText && (
               <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
                 <span className="text-4xl animate-spin-slow">🌱</span>
@@ -172,9 +177,9 @@ export function InsightsClient(): React.ReactElement {
               </div>
             )}
             {streamedText && (
-              <div className="prose prose-sm max-w-none">
-                {streamedText}
-                {loading && <span className="animate-pulse ml-0.5 text-forest-600">▊</span>}
+              <div className="prose prose-sm max-w-none text-slateBlue-800 space-y-2">
+                <ReactMarkdown>{streamedText}</ReactMarkdown>
+                {loading && <span className="animate-pulse ml-0.5 text-forest-600 font-bold">▊</span>}
               </div>
             )}
           </div>

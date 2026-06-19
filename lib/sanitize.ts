@@ -1,7 +1,7 @@
-import DOMPurify from 'isomorphic-dompurify';
-
 /**
  * Sanitizes an input string to prevent potential HTML/Script injection attacks.
+ * Since this runs in a Next.js Server Action, we avoid DOMPurify/JSDOM which
+ * crashes trying to read local stylesheets.
  * @param input The raw string input from user interface actions.
  * @returns The clean sanitized output string.
  */
@@ -9,7 +9,8 @@ export function sanitizeInput(input: string): string {
   if (!input) {
     return '';
   }
-  return DOMPurify.sanitize(input.trim());
+  // Strip basic HTML tags and trim
+  return input.trim().replace(/<[^>]*>?/gm, '');
 }
 
 /**

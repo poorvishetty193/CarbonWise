@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Route protection middleware using next-firebase-auth-edge cookies.
+ * serviceAccount is required so the library uses our credentials directly
+ * instead of trying to reach the GCE metadata server (which fails locally).
  * @param request The incoming NextRequest.
  * @returns NextResponse or native Response.
  */
@@ -22,6 +24,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse | R
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 12 * 60 * 60 * 24, // 12 days
+    },
+    serviceAccount: {
+      projectId: process.env.FIREBASE_PROJECT_ID || '',
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+      privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
     },
     handleValidToken: async () => {
       if (['/login', '/register'].includes(request.nextUrl.pathname)) {

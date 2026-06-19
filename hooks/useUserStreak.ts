@@ -28,19 +28,39 @@ export function useUserStreak(uid: string | undefined): {
     }
 
     const docRef = doc(db, 'users', uid);
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setProfile(docSnap.data() as UserProfile);
-      } else {
-        setProfile(null);
-      }
-      setLoading(false);
-    }, (error: unknown) => {
-      console.error("Error fetching user profile for streak", error);
-      setLoading(false);
-    });
+    let unsubscribe: () => void = () => {};
 
-    return () => unsubscribe();
+    try {
+      unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setProfile(docSnap.data() as UserProfile);
+        } else {
+          setProfile(null);
+        }
+        setLoading(false);
+      }, (error: unknown) => {
+        console.error("Error fetching user profile for streak", error);
+        setLoading(false);
+      });
+    } catch (e: any) {
+      if (e.message?.includes('INTERNAL ASSERTION FAILED')) {
+        console.warn('Ignored Firestore onSnapshot assertion failure during fast remount');
+      } else {
+        console.error(e);
+      }
+    }
+
+    return () => {
+      try {
+        unsubscribe();
+      } catch (e: any) {
+        if (e.message?.includes('INTERNAL ASSERTION FAILED')) {
+          console.warn('Ignored Firestore unsubscribe assertion failure during fast unmount');
+        } else {
+          console.error(e);
+        }
+      }
+    };
   }, [uid]);
 
   return {

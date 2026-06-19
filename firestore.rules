@@ -7,12 +7,20 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // User activities matching: Users can only read/write their own activities
+    // User activities: read uses resource.data.uid, write uses request.resource.data.uid
     match /activities/{activityId} {
-      allow read, write: if request.auth != null && (resource == null || (resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid));
+      // READ: the existing document's uid must match the caller
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      // CREATE: the incoming document's uid must match the caller
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      // UPDATE / DELETE: both the existing and incoming uid must match
+      allow update: if request.auth != null
+                    && resource.data.uid == request.auth.uid
+                    && request.resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
     
-    // Leaderboard matching: Anyone can read, but only Admin / Cloud Functions can write
+    // Leaderboard matching: Any authenticated user can read; writes are Admin-SDK-only
     match /leaderboard/{weekId}/entries/{userId} {
       allow read: if request.auth != null;
       allow write: if false; // Only written via Firebase Admin SDK server-side
