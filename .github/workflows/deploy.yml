@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting
+name: Deploy to Firebase App Hosting
 
 on:
   push:
@@ -7,13 +7,26 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # Required for Workload Identity Federation
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+
       - run: npm ci
+
+      # Type-check and test before deploying
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm test
+
+      # Build with public env vars so Next.js can embed them
       - run: npm run build
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
@@ -24,9 +37,14 @@ jobs:
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
           NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          channelId: live
-          projectId: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+
+      # Deploy Firestore rules first for safety
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy Firestore rules
+        run: firebase deploy --only firestore:rules --token "${{ secrets.FIREBASE_TOKEN }}" --project "${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}"
+
+      # Deploy to Firebase App Hosting (supports Next.js SSR/streaming)
+      - name: Deploy to Firebase App Hosting
+        run: firebase apphosting:backends:deploy --token "${{ secrets.FIREBASE_TOKEN }}" --project "${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}"

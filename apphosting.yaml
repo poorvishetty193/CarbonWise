@@ -1,0 +1,51 @@
+# Firebase App Hosting configuration for CarbonWise (Next.js 14)
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  # Maximum number of concurrent requests per instance
+  concurrency: 80
+  # CPU allocation per instance (0.5 - 8)
+  cpu: 1
+  # Memory allocation per instance
+  memoryMiB: 512
+  # Minimum number of instances (0 = scale to zero)
+  minInstances: 0
+  # Maximum number of instances
+  maxInstances: 10
+
+env:
+  # Public Firebase client config (safe to expose)
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    secret: NEXT_PUBLIC_FIREBASE_API_KEY
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    secret: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    secret: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    secret: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    secret: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    secret: NEXT_PUBLIC_FIREBASE_APP_ID
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    secret: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  - variable: NEXT_PUBLIC_APP_URL
+    secret: NEXT_PUBLIC_APP_URL
+
+  # Server-side secrets (never exposed to browser)
+  - variable: FIREBASE_PROJECT_ID
+    secret: FIREBASE_PROJECT_ID
+  - variable: FIREBASE_CLIENT_EMAIL
+    secret: FIREBASE_CLIENT_EMAIL
+  - variable: FIREBASE_PRIVATE_KEY
+    secret: FIREBASE_PRIVATE_KEY
+  - variable: ANTHROPIC_API_KEY
+    secret: ANTHROPIC_API_KEY
+  - variable: COOKIE_SECRET_KEY_CURRENT
+    secret: COOKIE_SECRET_KEY_CURRENT
+  - variable: COOKIE_SECRET_KEY_PREVIOUS
+    secret: COOKIE_SECRET_KEY_PREVIOUS
+  - variable: RATE_LIMIT_WINDOW_MS
+    value: "60000"
+  - variable: RATE_LIMIT_MAX_REQUESTS
+    value: "10"
