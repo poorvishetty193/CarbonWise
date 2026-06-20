@@ -7,7 +7,7 @@ interface ImpactGlobeProps {
   kgSaved: number;
 }
 
-export function ImpactGlobe({ kgSaved }: ImpactGlobeProps) {
+export default function ImpactGlobe({ kgSaved }: ImpactGlobeProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const treeCount = Math.max(Math.round(kgSaved / 22), 1);
 

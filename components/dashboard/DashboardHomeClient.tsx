@@ -4,12 +4,12 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 
 const EmissionsRing = dynamic(
-  () => import('../charts/EmissionsRing').then((mod) => mod.EmissionsRing),
+  () => import('../charts/EmissionsRing'),
   { ssr: false }
 );
 
 const WeeklyBar = dynamic(
-  () => import('../charts/WeeklyBar').then((mod) => mod.WeeklyBar),
+  () => import('../charts/WeeklyBar'),
   { ssr: false }
 );
 

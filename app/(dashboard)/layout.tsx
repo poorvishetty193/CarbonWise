@@ -3,14 +3,12 @@ import { cookies } from 'next/headers';
 import { getTokens } from 'next-firebase-auth-edge';
 import { Shell } from '../../components/layout/Shell';
 import { AuthProvider } from '../../lib/auth-context';
-import dynamic from 'next/dynamic';
-
-const PageTransition = dynamic(
-  () => import('../../components/layout/PageTransition').then((mod) => mod.PageTransition),
-  { ssr: false }
-);
+import { PageTransition } from '../../components/layout/PageTransition';
 
 import type { AuthSessionContext } from '../../lib/auth-context';
+
+export const dynamicParams = true;
+export const dynamic = 'force-dynamic';
 
 /**
  * Server Component layout for all dashboard routes.
@@ -71,4 +69,3 @@ export default async function DashboardLayout({
     </AuthProvider>
   );
 }
-

@@ -15,5 +15,5 @@ export const metadata: Metadata = {
  * @returns React element representing the leaderboard route.
  */
 export default function LeaderboardPage(): React.ReactElement {
-  return <LeaderboardClient />;
+ return <LeaderboardClient />;
 }

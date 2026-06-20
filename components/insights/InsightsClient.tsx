@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
 const ImpactGlobe = dynamic(
-  () => import('../charts/ImpactGlobe').then((mod) => mod.ImpactGlobe),
+  () => import('../charts/ImpactGlobe'),
   { ssr: false }
 );
 
@@ -16,8 +16,8 @@ import { useAuthSession } from '../../lib/auth-context';
 import { CATEGORY_COLORS } from '../../lib/constants';
 import type { ActivityCategory } from '../../types';
 
-import ReactMarkdown from 'react-markdown';
-
+// Dynamically import ReactMarkdown to prevent Next.js 14 dev-server ESM interop errors
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
 /**
  * InsightsClient renders the client-side stateful AI Climate Insights view.
  * Streams personalized carbon reduction advice based on logged activities.

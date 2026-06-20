@@ -1,16 +1,9 @@
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase/client';
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { LeaderboardEntry } from '../types';
 
-/**
- * React hook that listens to the weekly community rankings in real-time.
- * 
- * @param weekId - The ISO week string (e.g. "2024-W23"). If empty, listening is skipped.
- * @returns Object holding sorted leaderboard entries array and loading state.
- * @throws {never} This hook handles all database subscription errors internally.
- */
-export function useLeaderboard(weekId: string): {
+export function useLeaderboard(): {
   entries: LeaderboardEntry[];
   loading: boolean;
 } {
@@ -18,32 +11,41 @@ export function useLeaderboard(weekId: string): {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!weekId) {
-      setEntries([]);
-      setLoading(false);
-      return;
-    }
-
     const q = query(
-      collection(db, 'leaderboard', weekId, 'entries'),
-      orderBy('weeklyKgSaved', 'desc'),
-      limit(25)
+      collection(db, 'users'),
+      orderBy('totalKgSaved', 'desc')
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items: LeaderboardEntry[] = [];
-      snapshot.forEach((doc) => {
-        items.push({ uid: doc.id, ...doc.data() } as LeaderboardEntry);
-      });
-      setEntries(items);
-      setLoading(false);
-    }, (error: unknown) => {
-      console.error("Error fetching leaderboard", error);
-      setLoading(false);
+    const unsubscribe = onSnapshot(
+  q,
+  (snapshot) => {
+    console.log("Users found:", snapshot.size);
+
+    const items: LeaderboardEntry[] = [];
+
+    snapshot.forEach((doc) => {
+      console.log(doc.id, doc.data());
+
+      const data = doc.data();
+
+      items.push({
+        uid: doc.id,
+        displayName: data.displayName || 'Anonymous',
+        weeklyKgSaved: data.totalKgSaved || 0,
+      } as LeaderboardEntry);
     });
 
+    setEntries(items);
+    setLoading(false);
+  },
+      (error) => {
+        console.error('Error fetching leaderboard', error);
+        setLoading(false);
+      }
+    );
+
     return () => unsubscribe();
-  }, [weekId]);
+  }, []);
 
   return { entries, loading };
 }

@@ -8,7 +8,7 @@ interface EmissionsRingProps {
   budgetKg: number;
 }
 
-export function EmissionsRing({ currentKg, budgetKg }: EmissionsRingProps) {
+export default function EmissionsRing({ currentKg, budgetKg }: EmissionsRingProps) {
   const percentage = Math.min((currentKg / budgetKg) * 100, 100);
   const isOver = currentKg > budgetKg;
   

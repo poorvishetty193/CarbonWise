@@ -86,6 +86,15 @@ export function ProfileClient(): React.ReactElement {
     );
   }
 
+  console.log({
+  Button,
+  Input,
+  Card,
+  BADGE_DEFINITIONS,
+  useUserStreak,
+  useAuthSession,
+});
+
   return (
     <div className="space-y-8 animate-fade-in font-sans">
       {/* ── Header ── */}

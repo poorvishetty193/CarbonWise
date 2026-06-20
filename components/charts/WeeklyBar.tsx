@@ -21,7 +21,7 @@ interface WeeklyBarProps {
  * @param props.data Loaded weekly activity aggregates grouped by category.
  * @returns React element.
  */
-export function WeeklyBar({ data }: WeeklyBarProps): ReactElement {
+export default function WeeklyBar({ data }: WeeklyBarProps): ReactElement {
   /**
    * Custom Tooltip renderer including carbon-to-tree math equivalents.
    */

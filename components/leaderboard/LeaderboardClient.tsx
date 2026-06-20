@@ -26,7 +26,7 @@ function getCurrentWeekId(): string {
 export function LeaderboardClient(): React.ReactElement {
   const { uid } = useAuthSession();
   const weekId = getCurrentWeekId();
-  const { entries, loading } = useLeaderboard(weekId);
+  const { entries, loading } = useLeaderboard();
 
   const [challengeCount, setChallengeCount] = useState(142);
   const [hasJoinedChallenge, setHasJoinedChallenge] = useState(false);

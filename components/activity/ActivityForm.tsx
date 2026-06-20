@@ -2,12 +2,7 @@
 
 import React, { useState, ReactElement, ChangeEvent, FormEvent } from 'react';
 import { ActivityCategory } from '../../types';
-import dynamic from 'next/dynamic';
-
-const CategoryPicker = dynamic(
-  () => import('./CategoryPicker').then((mod) => mod.CategoryPicker),
-  { ssr: false }
-);
+import { CategoryPicker } from './CategoryPicker';
 
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';

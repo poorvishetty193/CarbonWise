@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, PlusSquare, BarChart3, Trophy, User, LogOut } from 'lucide-react';
+import { Home, PlusSquare, BarChart3, Trophy, User, X } from 'lucide-react';
 import { logout } from '../../lib/logout';
 
 /**
@@ -33,7 +33,7 @@ export function MobileNav(): React.ReactElement {
               key={href}
               href={href}
               aria-label={label}
-              className={`flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
                 isActive 
                   ? 'text-forest-600 font-semibold' 
                   : 'text-slateBlue-500 hover:text-slateBlue-800'
@@ -44,19 +44,15 @@ export function MobileNav(): React.ReactElement {
             </Link>
           );
         })}
-
-        {/* Logout button */}
         <button
-          id="mobile-logout-btn"
           onClick={() => void logout()}
-          aria-label="Log out"
-          className="flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-red-400 hover:text-red-600"
+          aria-label="Log Out"
+          className="flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 text-red-500 hover:text-red-600"
         >
-          <LogOut className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] tracking-tight">Log Out</span>
+          <X className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px] tracking-tight">Logout</span>
         </button>
       </div>
     </nav>
   );
 }
-
