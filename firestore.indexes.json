@@ -4,8 +4,15 @@
       "collectionGroup": "activities",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "uid",       "order": "ASCENDING" },
-        { "fieldPath": "loggedAt",  "order": "DESCENDING" }
+        { "fieldPath": "uid",          "order": "ASCENDING" },
+        { "fieldPath": "loggedAt",     "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "totalKgSaved", "order": "DESCENDING" }
       ]
     }
   ],

@@ -22,7 +22,7 @@ export function useLeaderboard(topN = 20): {
   useEffect(() => {
     const q = query(
       collection(db, 'users'),
-      orderBy('totalKgSaved', 'desc'),
+      orderBy('valueKg', 'desc'),
       limit(topN)
     );
 
