@@ -21,6 +21,7 @@ export async function createOrUpdateProfile(profile: {
   displayName: string;
   email: string;
   weeklyBudgetKg?: number;
+  photoURL?: string;
 }): Promise<{ success: boolean }> {
   try {
     const sanitized = sanitizeObject(profile);
@@ -32,19 +33,23 @@ export async function createOrUpdateProfile(profile: {
         uid: sanitized.uid,
         displayName: sanitized.displayName,
         email: sanitized.email,
-        weeklyBudgetKg: sanitized.weeklyBudgetKg || 150, 
+        photoURL: sanitized.photoURL || null,
+        weeklyBudgetKg: sanitized.weeklyBudgetKg || 150,
         streakDays: 0,
         totalKgSaved: 0,
-        badges: ['first_log'], 
+        badges: ['first_log'],
         createdAt: new Date().toISOString()
       });
     } else {
-      const updateData: Record<string, string | number | string[]> = {};
+      const updateData: Record<string, string | number | string[] | null> = {};
       if (sanitized.displayName) {
         updateData.displayName = sanitized.displayName;
       }
       if (sanitized.weeklyBudgetKg !== undefined) {
         updateData.weeklyBudgetKg = Number(sanitized.weeklyBudgetKg);
+      }
+      if (sanitized.photoURL !== undefined) {
+        updateData.photoURL = sanitized.photoURL || null;
       }
 
       await userRef.update(updateData);

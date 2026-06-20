@@ -6,6 +6,7 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../../lib/firebase/client';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
+import { createOrUpdateProfile } from '../../actions/user';
 
 /**
  * Authentication login page.
@@ -22,7 +23,8 @@ export default function LoginPage() {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      const idToken = await userCredential.user.getIdToken();
+      const { user } = userCredential;
+      const idToken = await user.getIdToken();
 
       const res = await fetch('/api/login', {
         method: 'POST',
@@ -32,6 +34,13 @@ export default function LoginPage() {
       });
 
       if (res.ok) {
+        // Upsert Firestore profile so name + avatar appear in leaderboard immediately
+        await createOrUpdateProfile({
+          uid: user.uid,
+          displayName: user.displayName || 'CarbonWise User',
+          email: user.email || '',
+          photoURL: user.photoURL ?? undefined,
+        });
         router.push('/');
       } else {
         setError('Failed to establish server session. Please try again.');

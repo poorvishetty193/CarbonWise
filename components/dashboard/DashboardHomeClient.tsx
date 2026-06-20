@@ -62,7 +62,8 @@ export function DashboardHomeClient(): React.ReactElement {
     shopping:  i === todayIdx ? dailyTotal * 0.05 : seedShopping[i],
   }));
 
-  const greeting = displayName ?? profile?.displayName ?? 'Climate Hero';
+  // Prefer live Firestore value so profile edits reflect instantly without re-login
+  const greeting = profile?.displayName || displayName || 'Climate Hero';
   const dailyBudget = weeklyBudget / 7;
   const dailyRemaining = Math.max(0, dailyBudget - dailyTotal);
 

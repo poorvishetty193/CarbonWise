@@ -51,6 +51,7 @@ export function ProfileClient(): React.ReactElement {
         displayName,
         email: profile?.email || email || 'user@example.com',
         weeklyBudgetKg: weeklyBudget,
+        photoURL: photoURL ?? undefined,
       });
       setSuccessMsg('Profile updated successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
@@ -86,14 +87,6 @@ export function ProfileClient(): React.ReactElement {
     );
   }
 
-  console.log({
-  Button,
-  Input,
-  Card,
-  BADGE_DEFINITIONS,
-  useUserStreak,
-  useAuthSession,
-});
 
   return (
     <div className="space-y-8 animate-fade-in font-sans">

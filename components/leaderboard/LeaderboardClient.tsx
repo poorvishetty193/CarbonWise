@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -10,7 +11,7 @@ import { format, startOfWeek } from 'date-fns';
 
 /**
  * Returns the ISO week identifier string, e.g. "2024-W23".
- * @returns Week ID string for Firestore leaderboard collection path.
+ * @returns Week ID string for display in the leaderboard header.
  */
 function getCurrentWeekId(): string {
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -18,15 +19,49 @@ function getCurrentWeekId(): string {
 }
 
 /**
- * LeaderboardClient renders the client-side stateful Community Leaderboard.
- * Displays real-time weekly standings and the interactive Ripple Challenges.
- * 
+ * Renders a user avatar — photo if available, otherwise an initial badge.
+ */
+function Avatar({
+  displayName,
+  photoURL,
+  size = 36,
+}: {
+  displayName: string;
+  photoURL?: string;
+  size?: number;
+}) {
+  if (photoURL) {
+    return (
+      <Image
+        src={photoURL}
+        alt={displayName}
+        width={size}
+        height={size}
+        className="rounded-full object-cover border border-surface-border"
+      />
+    );
+  }
+  return (
+    <div
+      className="rounded-full flex items-center justify-center bg-forest-100 text-forest-700 font-bold text-sm border border-surface-border"
+      style={{ width: size, height: size }}
+      aria-label={displayName}
+    >
+      {(displayName || '?')[0].toUpperCase()}
+    </div>
+  );
+}
+
+/**
+ * LeaderboardClient renders the real-time Community Leaderboard.
+ * Fetches actual users from Firestore ordered by totalKgSaved descending.
+ *
  * @returns React element representing the community leaderboard view.
  */
 export function LeaderboardClient(): React.ReactElement {
   const { uid } = useAuthSession();
   const weekId = getCurrentWeekId();
-  const { entries, loading } = useLeaderboard();
+  const { entries, loading, error } = useLeaderboard(20);
 
   const [challengeCount, setChallengeCount] = useState(142);
   const [hasJoinedChallenge, setHasJoinedChallenge] = useState(false);
@@ -46,19 +81,6 @@ export function LeaderboardClient(): React.ReactElement {
     }).catch((err: unknown) => console.error('[LeaderboardClient] Analytics error:', err));
   };
 
-  /** Seed data shown while Firestore loads or when collection is empty. */
-  const seedEntries = [
-    { uid: 'u1', displayName: 'Deep Forest', weeklyKgSaved: 42.5, rank: 1 },
-    { uid: 'u2', displayName: 'Eco Warrior', weeklyKgSaved: 38.2, rank: 2 },
-    { uid: uid ?? 'you', displayName: 'You', weeklyKgSaved: 32.1, rank: 3 },
-    { uid: 'u3', displayName: 'Green Traveler', weeklyKgSaved: 28.0, rank: 4 },
-    { uid: 'u4', displayName: 'Solar Advocate', weeklyKgSaved: 21.4, rank: 5 },
-  ];
-
-  const displayList = entries.length > 0
-    ? entries.map((e, i) => ({ ...e, rank: i + 1 }))
-    : seedEntries;
-
   const rankMedal: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
   return (
@@ -76,40 +98,74 @@ export function LeaderboardClient(): React.ReactElement {
           <Card>
             <h3 className="text-lg font-display font-bold text-forest-900 mb-4">Weekly Standings</h3>
 
+            {/* Loading skeleton */}
             {loading && (
-              <div className="space-y-3">
+              <div className="space-y-3" aria-busy="true" aria-label="Loading leaderboard">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div key={i} className="h-14 bg-surface-border rounded-xl animate-pulse" />
                 ))}
               </div>
             )}
 
-            {!loading && (
+            {/* Error state */}
+            {!loading && error && (
+              <div className="text-center py-10 space-y-2">
+                <span className="text-3xl">⚠️</span>
+                <p className="text-sm text-amberAlert-700 font-medium">{error}</p>
+                <p className="text-xs text-slateBlue-500">
+                  Make sure the Firestore index on <code>totalKgSaved (desc)</code> is created.
+                </p>
+              </div>
+            )}
+
+            {/* Empty state — shown only when there are genuinely no users yet */}
+            {!loading && !error && entries.length === 0 && (
+              <div className="text-center py-12 space-y-2">
+                <span className="text-4xl">🌍</span>
+                <p className="text-sm text-slateBlue-600 font-semibold">No rankings yet.</p>
+                <p className="text-xs text-slateBlue-400">
+                  Start logging activities to be the first on the board!
+                </p>
+              </div>
+            )}
+
+            {/* Real user rows */}
+            {!loading && !error && entries.length > 0 && (
               <div className="space-y-2">
-                {displayList.map((entry) => {
+                {entries.map((entry) => {
                   const isSelf = entry.uid === uid;
                   const medal = rankMedal[entry.rank];
                   return (
                     <div
                       key={entry.uid}
-                      className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
-                         isSelf
-                           ? 'bg-forest-50 border-forest-200 shadow-sm'
-                           : 'bg-white border-surface-border hover:border-surface-border hover:shadow-card'
+                      className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${
+                        isSelf
+                          ? 'bg-forest-50 border-forest-200 shadow-sm'
+                          : 'bg-white border-surface-border hover:shadow-card'
                       }`}
                     >
-                      <div className="flex items-center gap-4">
-                        <span className="w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold bg-surface-soft text-slateBlue-700">
+                      <div className="flex items-center gap-3">
+                        {/* Rank badge */}
+                        <span className="w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold bg-surface-soft text-slateBlue-700 shrink-0">
                           {medal ?? entry.rank}
                         </span>
+
+                        {/* Avatar */}
+                        <Avatar displayName={entry.displayName} photoURL={entry.photoURL} size={36} />
+
+                        {/* Name */}
                         <div>
-                          <span className={`text-sm font-semibold block ${isSelf ? 'text-forest-800' : 'text-slateBlue-900'}`}>
+                          <span className={`text-sm font-semibold block leading-tight ${isSelf ? 'text-forest-800' : 'text-slateBlue-900'}`}>
                             {entry.displayName}
-                            {isSelf && <span className="ml-2 text-[10px] text-forest-600 font-bold uppercase tracking-wider">(You)</span>}
+                            {isSelf && (
+                              <span className="ml-2 text-[10px] text-forest-600 font-bold uppercase tracking-wider">(You)</span>
+                            )}
                           </span>
                         </div>
                       </div>
-                      <div className="text-right">
+
+                      {/* Score */}
+                      <div className="text-right shrink-0">
                         <span className="text-sm font-bold text-forest-900">{entry.weeklyKgSaved.toFixed(1)}</span>
                         <span className="text-xs text-slateBlue-500 ml-1">kg saved</span>
                       </div>
