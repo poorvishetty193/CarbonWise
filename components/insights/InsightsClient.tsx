@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 const ImpactGlobe = dynamic(

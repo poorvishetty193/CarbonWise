@@ -26,14 +26,14 @@ export default function WeeklyBar({ data }: WeeklyBarProps): ReactElement {
   /**
    * Custom Tooltip renderer including carbon-to-tree math equivalents.
    */
-  const renderTooltip = ({ active, payload, label }: any): ReactElement | null => {
+  const renderTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name?: string; value?: number | string }>; label?: string }): ReactElement | null => {
     if (active && payload && payload.length) {
-      const total = payload.reduce((sum: number, entry: any) => sum + (Number(entry.value) || 0), 0);
+      const total = payload.reduce((sum: number, entry: { value?: number | string }) => sum + (Number(entry.value) || 0), 0);
       const treeEquivalent = total / 22; // 1 tree absorbs ~22kg CO2 yearly
       return (
         <div className="bg-forest-900 text-white p-3 rounded-xl border border-forest-800 shadow-lg text-xs space-y-1 font-sans">
           <p className="font-bold border-b border-forest-800 pb-1">{label}</p>
-          {payload.map((entry: any) => (
+          {payload.map((entry: { name?: string; value?: number | string }) => (
             <p key={entry.name} className="flex justify-between space-x-4">
               <span className="capitalize">{entry.name}:</span>
               <span className="font-semibold">{Number(entry.value).toFixed(1)} kg</span>

@@ -1,5 +1,5 @@
 import { db } from './client';
-import { collection, query, where, orderBy, limit, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
 import { ActivityLog, LeaderboardEntry, UserProfile } from '../../types';
 
 /**

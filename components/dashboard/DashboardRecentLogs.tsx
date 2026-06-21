@@ -24,7 +24,7 @@ export function DashboardRecentLogs({ activities }: DashboardRecentLogsProps) {
           href={ROUTES.LOG}
           className="text-sm font-semibold text-forest-600 hover:text-forest-750 transition-colors"
         >
-          Log New Activity +'
+          Log New Activity +&apos;
         </Link>
       </div>
 
@@ -39,7 +39,7 @@ export function DashboardRecentLogs({ activities }: DashboardRecentLogsProps) {
             <p className="text-2xl mb-2">dYO</p>
             <p>No activities logged today.</p>
             <Link href={ROUTES.LOG} className="mt-2 inline-block text-forest-600 font-semibold hover:underline">
-              Start tracking now +'
+              Start tracking now +&apos;
             </Link>
           </div>
         )}

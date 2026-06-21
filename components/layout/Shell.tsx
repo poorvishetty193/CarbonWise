@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { MessageCircle } from 'lucide-react';
 import { MobileNav } from './MobileNav';
 import { SkipToContent } from './SkipToContent';
 import { useAuthSession } from '../../lib/auth-context';

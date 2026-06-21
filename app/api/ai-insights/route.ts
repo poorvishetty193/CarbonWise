@@ -97,11 +97,11 @@ export async function POST(req: NextRequest): Promise<Response> {
         'Connection': 'keep-alive',
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[AI Insights API] Error generating content:', error);
     
     // Fallback to mock stream if we hit Google's 429 quota limits
-    if (error?.status === 429 || error?.message?.includes('429')) {
+    if ((error as { status?: number })?.status === 429 || (error as { message?: string })?.message?.includes('429')) {
       return getMockStreamResponse();
     }
 

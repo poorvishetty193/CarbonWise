@@ -2,10 +2,10 @@
 
 import { getAdminDb } from '../../lib/firebase/admin';
 import { calculateEmissions } from '../../lib/carbon-calculator';
-import { ActivityCategory } from '../../types';
+import { ActivityCategory, UserProfile } from '../../types';
 import { sanitizeObject } from '../../lib/sanitize';
 import { revalidatePath } from 'next/cache';
-import { startOfDay, startOfWeek, isAfter, format } from 'date-fns';
+import { startOfDay, startOfWeek, format } from 'date-fns';
 import { toErrorMessage } from '@/lib/errors';
 
 function calculateStreak(currentStreak: number, lastLoggedDate: string, todayStr: string, yesterdayStr: string): number {
@@ -127,7 +127,14 @@ export async function logActivity(formData: {
       const userDoc = await transaction.get(userRef);
       const leaderboardDoc = await transaction.get(leaderboardRef);
 
-      let userData: any = userDoc.exists ? userDoc.data() : {};
+      interface UserData extends Partial<UserProfile> {
+  lastLoggedDate?: string;
+  lastBudgetSavedDate?: string;
+  budgetSaverStreak?: number;
+  totalKgSaved?: number;
+  weeklyBudgetKg?: number;
+}
+      const userData = userDoc.exists ? (userDoc.data() as UserData) : {};
 
       const currentStreak = userData?.streakDays || 0;
       const currentSaved = userData?.totalKgSaved || 0;

@@ -1,13 +1,13 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const { mockDocGet, mockUpdate, mockSet, getActivitiesList, setActivitiesList } = vi.hoisted(() => {
-  let list: any[] = [];
+  let list: Record<string, unknown>[] = [];
   return {
     mockDocGet: vi.fn(),
     mockUpdate: vi.fn(),
     mockSet: vi.fn(),
     getActivitiesList: () => list,
-    setActivitiesList: (newList: any[]) => {
+    setActivitiesList: (newList: Record<string, unknown>[]) => {
       list = newList;
     }
   };
@@ -33,7 +33,7 @@ vi.mock('../../lib/firebase/admin', () => {
       where: vi.fn().mockImplementation(() => ({
         get: vi.fn().mockImplementation(async () => {
           return {
-            forEach: (cb: (doc: any) => void) => {
+            forEach: (cb: (doc: Record<string, unknown>) => void) => {
               getActivitiesList().forEach(cb);
             }
           };

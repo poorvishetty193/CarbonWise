@@ -13,15 +13,12 @@ const WeeklyBar = dynamic(
   { ssr: false }
 );
 
-import { Card } from '../ui/Card';
+
 import { useUserStreak } from '../../hooks/useUserStreak';
 import { useCarbonBudget } from '../../hooks/useCarbonBudget';
 import { useActivityLog } from '../../hooks/useActivityLog';
 import { useRealtimeScore } from '../../hooks/useRealtimeScore';
 import { useAuthSession } from '../../lib/auth-context';
-import { ActivityCard } from '../activity/ActivityCard';
-import Link from 'next/link';
-import { ROUTES } from '../../lib/constants';
 import { DashboardSkeleton } from './DashboardSkeleton';
 import { DashboardStats } from './DashboardStats';
 import { DashboardRecentLogs } from './DashboardRecentLogs';
