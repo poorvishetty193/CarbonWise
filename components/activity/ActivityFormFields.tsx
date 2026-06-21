@@ -15,13 +15,6 @@ interface ActivityFormFieldsProps {
 /**
  *  Activity Form Fields function.
  * @param props - Component properties.
- * @param props.category - Semantic unit for category.
- * @param props.subcategory - Semantic unit for subcategory.
- * @param props.amount - Semantic unit for amount.
- * @param props.error - Semantic unit for error.
- * @param props.handleCategoryChange - Semantic unit for handleCategoryChange.
- * @param props.handleFieldChange - Semantic unit for handleFieldChange.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function ActivityFormFields({ category, subcategory, amount, error, handleCategoryChange, handleFieldChange }: ActivityFormFieldsProps) {

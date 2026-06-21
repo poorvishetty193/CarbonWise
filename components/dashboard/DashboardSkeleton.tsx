@@ -3,7 +3,6 @@ import { Card } from '../ui/Card';
 
 /**
  *  Dashboard Skeleton function.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function DashboardSkeleton() {

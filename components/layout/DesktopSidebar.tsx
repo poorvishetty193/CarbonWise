@@ -11,8 +11,6 @@ interface DesktopSidebarProps {
 /**
  *  Desktop Sidebar function.
  * @param props - Component properties.
- * @param props.displayName - Semantic unit for displayName.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function DesktopSidebar({ displayName }: DesktopSidebarProps) {

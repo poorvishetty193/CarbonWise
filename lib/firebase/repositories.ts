@@ -1,6 +1,6 @@
 import { db } from './client';
 import { collection, query, where, orderBy, limit, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { ActivityLog, LeaderboardEntry, UserProfile } from '../types';
+import { ActivityLog, LeaderboardEntry, UserProfile } from '../../types';
 
 /**
  * Subscribes to the user's logged activities in the 'activities' collection.

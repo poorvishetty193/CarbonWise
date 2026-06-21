@@ -3,8 +3,6 @@ import React from 'react';
 /**
  *  Activity Form Preview function.
  * @param props - Component properties.
- * @param props.liveEmissions - Semantic unit for liveEmissions.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function ActivityFormPreview({ liveEmissions }: { liveEmissions: number }) {

@@ -11,9 +11,6 @@ interface EmissionsRingProps {
 /**
  *  Emissions Ring function.
  * @param props - Component properties.
- * @param props.currentKg - Semantic unit for currentKg.
- * @param props.budgetKg - Semantic unit for budgetKg.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export default function EmissionsRing({ currentKg, budgetKg }: EmissionsRingProps) {

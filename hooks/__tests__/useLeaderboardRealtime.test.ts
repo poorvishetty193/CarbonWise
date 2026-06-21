@@ -9,7 +9,7 @@ vi.mock('@/lib/firebase/repositories', () => ({
 }));
 
 describe('useLeaderboardRealtime', () => {
-  let mockSubscribe: vi.Mock;
+  let mockSubscribe: any;
 
   beforeEach(() => {
     mockSubscribe = vi.fn().mockReturnValue(vi.fn());

@@ -6,7 +6,7 @@ import { useStreamingInsights } from '../useStreamingInsights';
 vi.mock('@/lib/firebase/repositories', () => ({}));
 
 describe('useStreamingInsights', () => {
-  let fetchSpy: vi.SpyInstance;
+  let fetchSpy: any;
 
   beforeEach(() => {
     fetchSpy = vi.spyOn(global, 'fetch');

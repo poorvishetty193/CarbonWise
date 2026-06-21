@@ -1,4 +1,12 @@
-'use server';
+const fs = require('fs');
+
+const path = 'D:/CarbonWise/app/actions/activity.ts';
+let code = fs.readFileSync(path, 'utf8');
+
+// I'll manually create the new code string by splitting and joining
+// But since the logic is straightforward, I can construct the new file content
+
+const newCode = `'use server';
 
 import { getAdminDb } from '../../lib/firebase/admin';
 import { calculateEmissions } from '../../lib/carbon-calculator';
@@ -239,3 +247,6 @@ export async function deleteActivity(id: string, uid: string): Promise<{ success
     throw error;
   }
 }
+`;
+
+fs.writeFileSync(path, newCode);

@@ -19,7 +19,6 @@ function getCurrentWeekId(): string {
 
 /**
  *  Leaderboard Client function.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function LeaderboardClient(): React.ReactElement {

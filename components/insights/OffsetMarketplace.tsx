@@ -2,7 +2,6 @@ import React from 'react';
 
 /**
  *  Offset Marketplace function.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function OffsetMarketplace() {

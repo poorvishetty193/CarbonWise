@@ -4,8 +4,6 @@ import { BADGE_DEFINITIONS } from '../../lib/constants';
 /**
  *  Profile Badges function.
  * @param props - Component properties.
- * @param props.badges - Semantic unit for badges.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function ProfileBadges({ badges }: { badges: string[] }) {

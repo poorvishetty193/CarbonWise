@@ -10,8 +10,6 @@ interface RippleChallengesProps {
 /**
  *  Ripple Challenges function.
  * @param props - Component properties.
- * @param props.uid - Semantic unit for uid.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function RippleChallenges({ uid }: RippleChallengesProps) {

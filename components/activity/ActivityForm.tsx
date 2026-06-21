@@ -21,10 +21,6 @@ interface ActivityFormProps {
 /**
  *  Activity Form function.
  * @param props - Component properties.
- * @param props.uid - Semantic unit for uid.
- * @param props.onSuccess - Semantic unit for onSuccess.
- * @param props.logActivityAction - Semantic unit for logActivityAction.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function ActivityForm({ uid, onSuccess, logActivityAction }: ActivityFormProps): ReactElement {

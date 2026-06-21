@@ -12,12 +12,6 @@ interface DashboardStatsProps {
 /**
  *  Dashboard Stats function.
  * @param props - Component properties.
- * @param props.totalKgSaved - Semantic unit for totalKgSaved.
- * @param props.isDailyOver - Semantic unit for isDailyOver.
- * @param props.dailyRemaining - Semantic unit for dailyRemaining.
- * @param props.weeklyTotal - Semantic unit for weeklyTotal.
- * @param props.weeklyBudget - Semantic unit for weeklyBudget.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function DashboardStats({

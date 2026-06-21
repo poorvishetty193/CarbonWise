@@ -11,11 +11,6 @@ interface AiWhispererDrawerProps {
 /**
  *  Ai Whisperer Drawer function.
  * @param props - Component properties.
- * @param props.isOpen - Semantic unit for isOpen.
- * @param props.onClose - Semantic unit for onClose.
- * @param props.aiLoading - Semantic unit for aiLoading.
- * @param props.aiResponse - Semantic unit for aiResponse.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function AiWhispererDrawer({ isOpen, onClose, aiLoading, aiResponse }: AiWhispererDrawerProps) {

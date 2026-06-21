@@ -8,8 +8,6 @@ interface TopHeaderProps {
 /**
  *  Top Header function.
  * @param props - Component properties.
- * @param props.onToggleWhisperer - Semantic unit for onToggleWhisperer.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function TopHeader({ onToggleWhisperer }: TopHeaderProps) {

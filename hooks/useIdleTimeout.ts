@@ -18,7 +18,6 @@ const ACTIVITY_EVENTS: (keyof WindowEventMap)[] = [
  *
  * @param timeoutMs - Idle duration in milliseconds before auto-logout (default 10 min).
  * @param enabled   - Set to false to disable the timer (e.g. when user is not logged in).
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function useIdleTimeout(

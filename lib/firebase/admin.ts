@@ -20,7 +20,6 @@ function getAdminApp(): admin.app.App {
 
 /**
  * Get Admin Db function.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function getAdminDb(): admin.firestore.Firestore {
@@ -29,7 +28,6 @@ export function getAdminDb(): admin.firestore.Firestore {
 
 /**
  * Get Admin Auth function.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function getAdminAuth(): admin.auth.Auth {

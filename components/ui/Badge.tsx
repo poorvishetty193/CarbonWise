@@ -8,9 +8,6 @@ interface BadgeProps {
 /**
  *  Badge function.
  * @param props - Component properties.
- * @param props.children - Semantic unit for children.
- * @param props.variant - Semantic unit for variant.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function Badge({ children, variant = 'neutral' }: BadgeProps) {

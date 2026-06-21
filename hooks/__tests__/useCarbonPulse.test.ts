@@ -10,8 +10,8 @@ vi.mock('@/lib/firebase/repositories', () => ({
 }));
 
 describe('useCarbonPulse', () => {
-  let mockSubscribeActivities: vi.Mock;
-  let mockSubscribeProfile: vi.Mock;
+  let mockSubscribeActivities: any;
+  let mockSubscribeProfile: any;
 
   beforeEach(() => {
     mockSubscribeActivities = vi.fn().mockReturnValue(vi.fn());

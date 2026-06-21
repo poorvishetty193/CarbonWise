@@ -10,10 +10,6 @@ interface AvatarProps {
 /**
  *  Avatar function.
  * @param props - Component properties.
- * @param props.displayName - Semantic unit for displayName.
- * @param props.photoURL - Semantic unit for photoURL.
- * @param props.size - Semantic unit for size.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function Avatar({ displayName, photoURL, size = 36 }: AvatarProps) {

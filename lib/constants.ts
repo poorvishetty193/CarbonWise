@@ -75,35 +75,6 @@ export const ROUTES = {
   REGISTER: '/register',
 } as const;
 
-/**
- * Internal API endpoints mapping.
- * @returns The shape or unit of this constant object.
- * @throws {never} This constant does not throw.
- */
-export const API_ENDPOINTS = {
-  CARBON_SCORE: '/api/carbon-score',
-  AI_INSIGHTS: '/api/ai-insights',
-  ANALYTICS: '/api/analytics',
-  LOGIN: '/api/login',
-  LOGOUT: '/api/logout',
-} as const;
-
-/**
- * Google Analytics and tracking events registry.
- * @returns The shape or unit of this constant object.
- * @throws {never} This constant does not throw.
- */
-export const ANALYTICS_EVENTS = {
-  ACTIVITY_LOGGED: 'activity_logged',
-  AI_INSIGHTS_REQUESTED: 'ai_insights_requested',
-  STREAK_MILESTONE: 'streak_milestone',
-  BADGE_EARNED: 'badge_earned',
-  LEADERBOARD_VIEWED: 'leaderboard_viewed',
-  BUDGET_ALERT_TRIGGERED: 'budget_alert_triggered',
-  OFFSET_LINK_CLICKED: 'offset_link_clicked',
-  ONBOARDING_COMPLETED: 'onboarding_completed',
-  CHALLENGE_JOINED: 'challenge_joined',
-} as const;
 
 /**
  *  E R R O R_ M E S S A G E S constant.

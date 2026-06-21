@@ -7,10 +7,6 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 /**
  *  Card function.
  * @param props - Component properties.
- * @param props.children - Semantic unit for children.
- * @param props.className - Semantic unit for className.
- * @param props.props - Semantic unit for props.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function Card({ children, className = '', ...props }: CardProps) {

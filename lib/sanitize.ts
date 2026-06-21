@@ -20,15 +20,15 @@ export function sanitizeInput(input: string): string {
  * @returns A fresh record copy with all safe string allocations.
  * @throws {never} This function does not throw.
  */
-export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
-  const sanitized = { ...obj };
+export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
+  const sanitized = { ...obj } as Record<string, unknown>;
   for (const key in sanitized) {
     if (Object.prototype.hasOwnProperty.call(sanitized, key)) {
       const val = sanitized[key];
       if (typeof val === 'string') {
-        sanitized[key] = sanitizeInput(val) as any;
+        sanitized[key] = sanitizeInput(val);
       }
     }
   }
-  return sanitized;
+  return sanitized as T;
 }

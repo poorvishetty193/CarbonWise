@@ -6,14 +6,6 @@ import dynamic from 'next/dynamic';
 const ImpactGlobe = dynamic(
   () => import('../charts/ImpactGlobe'),
   { ssr: false }
-'use client';
-
-import React, { useEffect } from 'react';
-import dynamic from 'next/dynamic';
-
-const ImpactGlobe = dynamic(
-  () => import('../charts/ImpactGlobe'),
-  { ssr: false }
 );
 
 import { Card } from '../ui/Card';

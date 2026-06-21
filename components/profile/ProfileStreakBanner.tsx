@@ -8,9 +8,6 @@ interface ProfileStreakBannerProps {
 /**
  *  Profile Streak Banner function.
  * @param props - Component properties.
- * @param props.streakDays - Semantic unit for streakDays.
- * @param props.totalKgSaved - Semantic unit for totalKgSaved.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function ProfileStreakBanner({ streakDays, totalKgSaved }: ProfileStreakBannerProps) {

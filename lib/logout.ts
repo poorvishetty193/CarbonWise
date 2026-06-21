@@ -1,5 +1,5 @@
-import { toErrorMessage } from './errors';
 'use client';
+import { toErrorMessage } from './errors';
 
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase/client';
@@ -11,7 +11,6 @@ import { auth } from './firebase/client';
  * 3. Redirects to /login
  *
  * Safe to call from any client component or hook.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export async function logout(): Promise<void> {

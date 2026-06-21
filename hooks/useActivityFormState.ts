@@ -10,7 +10,7 @@ interface UseActivityFormStateReturn {
   error: string;
   handleCategoryChange: (cat: ActivityCategory) => void;
   handleFieldChange: (val: number, subcat: string) => void;
-  handleSubmit: (e: FormEvent, logAction: (data: any) => Promise<{ success: boolean; emissions: number }>, uid: string, onSuccess?: (emissions: number) => void) => Promise<void>;
+  handleSubmit: (e: FormEvent, logAction: (data: { uid: string; category: ActivityCategory; subcategory: string; amount: number }) => Promise<{ success: boolean; emissions: number }>, uid: string, onSuccess?: (emissions: number) => void) => Promise<void>;
   reset: () => void;
   amount: number;
 }
@@ -60,7 +60,7 @@ export function useActivityFormState(): UseActivityFormStateReturn {
 
   const handleSubmit = async (
     e: FormEvent,
-    logAction: (data: any) => Promise<{ success: boolean; emissions: number }>,
+    logAction: (data: { uid: string; category: ActivityCategory; subcategory: string; amount: number }) => Promise<{ success: boolean; emissions: number }>,
     uid: string,
     onSuccess?: (emissions: number) => void
   ): Promise<void> => {

@@ -11,8 +11,6 @@ interface DashboardRecentLogsProps {
 /**
  *  Dashboard Recent Logs function.
  * @param props - Component properties.
- * @param props.activities - Semantic unit for activities.
- * @returns Shape or unit of the return value.
  * @throws {never} This function does not throw.
  */
 export function DashboardRecentLogs({ activities }: DashboardRecentLogsProps) {
