@@ -5,6 +5,14 @@ interface BadgeProps {
   variant?: 'success' | 'warning' | 'info' | 'neutral';
 }
 
+/**
+ *  Badge function.
+ * @param props - Component properties.
+ * @param props.children - Semantic unit for children.
+ * @param props.variant - Semantic unit for variant.
+ * @returns Shape or unit of the return value.
+ * @throws {never} This function does not throw.
+ */
 export function Badge({ children, variant = 'neutral' }: BadgeProps) {
   const styles = {
     success: 'bg-forest-100 text-forest-700 font-semibold',

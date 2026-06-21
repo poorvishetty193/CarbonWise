@@ -12,6 +12,7 @@ import { logActivity, deleteActivity } from '../../app/actions/activity';
  * Displays logging options and lists historical logs fetched in real-time.
  * 
  * @returns React element representing the log activities dashboard module.
+ * @throws {never} This function does not throw.
  */
 export function LogActivityClient(): React.ReactElement {
   const { uid } = useAuthSession();

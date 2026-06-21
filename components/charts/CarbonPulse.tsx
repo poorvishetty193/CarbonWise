@@ -15,6 +15,7 @@ interface CarbonPulseProps {
  * @param props.currentKg Active tracked emissions today.
  * @param props.budgetKg Target daily carbon budget.
  * @returns React component.
+ * @throws {never} This function does not throw.
  */
 export function CarbonPulse({ currentKg, budgetKg }: CarbonPulseProps): ReactElement {
   const percentage = budgetKg > 0 ? Math.min((currentKg / budgetKg) * 100, 150) : 0;

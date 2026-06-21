@@ -7,8 +7,10 @@ import { Button } from '../ui/Button';
 import { useUserStreak } from '../../hooks/useUserStreak';
 import { useAuthSession } from '../../lib/auth-context';
 import { createOrUpdateProfile } from '../../app/actions/user';
-import { BADGE_DEFINITIONS } from '../../lib/constants';
 import Image from 'next/image';
+import { ProfileBadges } from './ProfileBadges';
+import { ProfileSkeleton } from './ProfileSkeleton';
+import { ProfileStreakBanner } from './ProfileStreakBanner';
 
 /**
  * ProfileClient renders the client-side stateful Profile view.
@@ -16,6 +18,7 @@ import Image from 'next/image';
  * and lists earned gamified achievement badges.
  * 
  * @returns React element representing the user profile dashboard page.
+ * @throws {never} This function does not throw.
  */
 export function ProfileClient(): React.ReactElement {
   const { uid, email, displayName: sessionName, photoURL } = useAuthSession();
@@ -64,27 +67,7 @@ export function ProfileClient(): React.ReactElement {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-8 animate-pulse font-sans" aria-busy="true">
-        {/* Header Skeleton */}
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-surface-border" />
-          <div className="space-y-2">
-            <div className="h-6 w-32 bg-surface-border rounded-lg" />
-            <div className="h-4 w-44 bg-surface-border rounded-lg" />
-          </div>
-        </div>
-
-        {/* Streak Banner Skeleton */}
-        <div className="h-24 bg-surface-border rounded-2xl" />
-
-        {/* Details Grid Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 h-64 bg-white border border-surface-border rounded-2xl p-6" />
-          <div className="h-64 bg-white border border-surface-border rounded-2xl p-6" />
-        </div>
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
 
@@ -115,17 +98,7 @@ export function ProfileClient(): React.ReactElement {
       </div>
 
       {/* ── Streak Banner ── */}
-      <div className="flex items-center gap-4 bg-gradient-to-r from-forest-900 to-forest-700 text-white rounded-2xl p-5">
-        <span className="text-4xl" role="img" aria-label="fire">🔥</span>
-        <div>
-          <p className="text-xs uppercase tracking-wider font-semibold text-forest-300">Current Streak</p>
-          <p className="text-4xl font-display font-bold">{streakDays} <span className="text-xl font-normal text-forest-200">days</span></p>
-        </div>
-        <div className="ml-auto text-right">
-          <p className="text-xs text-forest-300">Total Saved</p>
-          <p className="text-2xl font-display font-bold">{(profile?.totalKgSaved ?? 0).toFixed(1)} <span className="text-sm font-normal text-forest-200">kg CO2e</span></p>
-        </div>
-      </div>
+      <ProfileStreakBanner streakDays={streakDays} totalKgSaved={profile?.totalKgSaved ?? 0} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* ── Settings Form ── */}
@@ -168,33 +141,7 @@ export function ProfileClient(): React.ReactElement {
         </div>
 
         {/* ── Badge Showcase ── */}
-        <div className="space-y-3">
-          <h3 className="text-lg font-display font-bold text-forest-900">My Badges</h3>
-          <div className="space-y-3">
-            {BADGE_DEFINITIONS.map((badge) => {
-              const earned = badges.includes(badge.id);
-              return (
-                <div
-                  key={badge.id}
-                  className={`flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 ${
-                    earned
-                      ? 'bg-white border-forest-200 shadow-card'
-                      : 'bg-surface-soft border-transparent opacity-40 grayscale'
-                  }`}
-                >
-                  <span className="text-2xl" role="img" aria-label={badge.title}>{badge.icon}</span>
-                  <div>
-                    <h4 className="text-sm font-bold text-slateBlue-900">{badge.title}</h4>
-                    <p className="text-[11px] text-slateBlue-500 leading-snug">{badge.description}</p>
-                  </div>
-                  {earned && (
-                    <span className="ml-auto text-forest-600 text-xs font-bold" aria-label="earned">✓</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <ProfileBadges badges={badges} />
       </div>
     </div>
   );

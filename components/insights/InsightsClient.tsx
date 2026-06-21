@@ -6,6 +6,14 @@ import dynamic from 'next/dynamic';
 const ImpactGlobe = dynamic(
   () => import('../charts/ImpactGlobe'),
   { ssr: false }
+'use client';
+
+import React, { useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+const ImpactGlobe = dynamic(
+  () => import('../charts/ImpactGlobe'),
+  { ssr: false }
 );
 
 import { Card } from '../ui/Card';
@@ -15,6 +23,9 @@ import { useActivityLog } from '../../hooks/useActivityLog';
 import { useAuthSession } from '../../lib/auth-context';
 import { CATEGORY_COLORS } from '../../lib/constants';
 import type { ActivityCategory } from '../../types';
+import { useStreamingInsights } from '../../hooks/useStreamingInsights';
+import { InsightsSkeleton } from './InsightsSkeleton';
+import { OffsetMarketplace } from './OffsetMarketplace';
 
 // Dynamically import ReactMarkdown to prevent Next.js 14 dev-server ESM interop errors
 const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
@@ -23,14 +34,14 @@ const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
  * Streams personalized carbon reduction advice based on logged activities.
  * 
  * @returns React element representing the AI insights view.
+ * @throws {never} This function does not throw.
  */
 export function InsightsClient(): React.ReactElement {
   const { uid } = useAuthSession();
   const { profile, loading: streakLoading } = useUserStreak(uid ?? undefined);
   const { activities, loading: activityLoading } = useActivityLog(uid ?? undefined);
 
-  const [streamedText, setStreamedText] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { text: streamedText, isStreaming: loading, trigger: fetchInsights } = useStreamingInsights(uid ?? '');
 
   const pageLoading = streakLoading || activityLoading;
 
@@ -48,47 +59,11 @@ export function InsightsClient(): React.ReactElement {
     return summary;
   }, [activities]);
 
-  /**
-   * Streams AI insights from /api/ai-insights.
-   * @returns Promise resolving when stream is complete.
-   */
-  const fetchInsights = useCallback(async (): Promise<void> => {
-    setLoading(true);
-    setStreamedText('');
-
-    try {
-      const response = await fetch('/api/ai-insights', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          activitySummary,
-          weeklyBudgetKg: profile?.weeklyBudgetKg ?? 150,
-        }),
-      });
-
-      if (!response.body) return;
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        setStreamedText((prev) => prev + decoder.decode(value));
-      }
-    } catch (error: unknown) {
-      console.error('[InsightsClient] AI stream failed:', error);
-      setStreamedText('Could not contact AI coach. Please check your connection and try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, [activitySummary, profile?.weeklyBudgetKg]);
-
   useEffect(() => {
     if (!pageLoading) {
-      fetchInsights();
+      fetchInsights(activitySummary, profile?.weeklyBudgetKg ?? 150);
     }
-  }, [pageLoading, fetchInsights]);
+  }, [pageLoading, fetchInsights, activitySummary, profile?.weeklyBudgetKg]);
 
   /** Category breakdown for the summary pills. */
   const categoryEntries = Object.entries(activitySummary) as [ActivityCategory, number][];
@@ -97,35 +72,7 @@ export function InsightsClient(): React.ReactElement {
   const kgSavedThisWeek = Math.max(0, weeklyBudget - totalWeeklyEmissions);
 
   if (pageLoading) {
-    return (
-      <div className="space-y-8 animate-fade-in font-sans" aria-busy="true">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-forest-900">AI Climate Insights</h1>
-          <p className="text-sm text-slateBlue-500 mt-1">
-            Personalized reduction paths built from your logged behaviors.
-          </p>
-        </div>
-
-        {/* Pills Skeleton */}
-        <div className="flex flex-wrap gap-2">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-7 w-28 bg-surface-border rounded-full animate-pulse" />
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="h-96 bg-white border border-surface-border rounded-3xl animate-pulse" />
-          <div className="h-96 bg-white border border-surface-border rounded-3xl animate-pulse p-6 space-y-4">
-            <div className="h-4 w-28 bg-surface-border rounded-lg" />
-            <div className="space-y-2">
-              <div className="h-3 w-full bg-surface-border rounded-lg" />
-              <div className="h-3 w-full bg-surface-border rounded-lg" />
-              <div className="h-3 w-3/4 bg-surface-border rounded-lg" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <InsightsSkeleton />;
   }
 
   return (
@@ -164,7 +111,7 @@ export function InsightsClient(): React.ReactElement {
         <Card className="flex flex-col min-h-[360px]">
           <div className="flex items-center justify-between mb-4">
             <span className="section-pill">🌿 AI Whisperer</span>
-            <Button size="sm" variant="ghost" onClick={fetchInsights} disabled={loading}>
+            <Button size="sm" variant="ghost" onClick={() => fetchInsights(activitySummary, profile?.weeklyBudgetKg ?? 150)} disabled={loading}>
               {loading ? '⏳ Thinking…' : '🔄 Refresh'}
             </Button>
           </div>
@@ -187,32 +134,7 @@ export function InsightsClient(): React.ReactElement {
       </div>
 
       {/* ── Offset Marketplace (informational) ── */}
-      <section aria-labelledby="offset-title" className="border-t border-surface-border pt-6">
-        <h3 id="offset-title" className="text-lg font-display font-bold text-forest-900 mb-3">
-          Carbon Offset Marketplace
-        </h3>
-        <p className="text-xs text-slateBlue-500 mb-4">
-          Verified offset projects aligned with Gold Standard and Verra VCS frameworks.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[
-            { name: 'Gold Standard', url: 'https://www.goldstandard.org/impact-quantification/carbon-offsets', emoji: '🥇' },
-            { name: 'Verra VCS', url: 'https://verra.org/project/vcs-program/', emoji: '🌍' },
-            { name: 'Cool Effect', url: 'https://www.cooleffect.org', emoji: '❄️' },
-          ].map((project) => (
-            <a
-              key={project.name}
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 p-4 bg-white border border-surface-border rounded-2xl hover:border-forest-200 hover:shadow-card-hover transition-all duration-200 text-sm font-semibold text-slateBlue-800"
-            >
-              <span className="text-xl">{project.emoji}</span>
-              {project.name}
-            </a>
-          ))}
-        </div>
-      </section>
+      <OffsetMarketplace />
     </div>
   );
 }

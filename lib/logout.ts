@@ -1,3 +1,4 @@
+import { toErrorMessage } from './errors';
 'use client';
 
 import { signOut } from 'firebase/auth';
@@ -10,17 +11,19 @@ import { auth } from './firebase/client';
  * 3. Redirects to /login
  *
  * Safe to call from any client component or hook.
+ * @returns Shape or unit of the return value.
+ * @throws {never} This function does not throw.
  */
 export async function logout(): Promise<void> {
   try {
     await fetch('/api/logout', { method: 'POST' });
   } catch (err) {
-    console.error('[logout] Failed to clear session cookie:', err);
+    console.error('[logout] Failed to clear session cookie:', toErrorMessage(err));
   }
   try {
     await signOut(auth);
   } catch (err) {
-    console.error('[logout] Firebase signOut failed:', err);
+    console.error('[logout] Firebase signOut failed:', toErrorMessage(err));
   }
   // Hard redirect so the middleware picks up the cleared cookie immediately
   window.location.href = '/login';

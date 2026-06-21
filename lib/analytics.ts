@@ -1,5 +1,6 @@
 import { getFirebaseAnalytics } from './firebase/client';
 import { logEvent } from 'firebase/analytics';
+import { toErrorMessage } from '@/lib/errors';
 
 /**
  * Registry of permitted parameters mapped to their event titles.
@@ -23,6 +24,7 @@ export interface EventParams {
  * @param event Named analytics event.
  * @param params Associated payload parameters.
  * @returns Promise representing the logging action.
+ * @throws {never} This function does not throw.
  */
 export async function trackEvent<K extends keyof EventParams>(
   event: K,
@@ -36,6 +38,6 @@ export async function trackEvent<K extends keyof EventParams>(
       }
     }
   } catch (error: unknown) {
-    console.error(`Error logging analytics event ${event}:`, error);
+    console.error(`Error logging analytics event ${event}:`, toErrorMessage(error));
   }
 }

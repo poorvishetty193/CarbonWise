@@ -4,6 +4,7 @@
  * crashes trying to read local stylesheets.
  * @param input The raw string input from user interface actions.
  * @returns The clean sanitized output string.
+ * @throws {never} This function does not throw.
  */
 export function sanitizeInput(input: string): string {
   if (!input) {
@@ -17,6 +18,7 @@ export function sanitizeInput(input: string): string {
  * Recursively inspects and cleans string properties of a key-value payload before database persistence.
  * @param obj The key-value record parameter payload.
  * @returns A fresh record copy with all safe string allocations.
+ * @throws {never} This function does not throw.
  */
 export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
   const sanitized = { ...obj };

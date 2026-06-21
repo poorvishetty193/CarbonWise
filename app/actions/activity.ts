@@ -6,6 +6,7 @@ import { ActivityCategory } from '../../types';
 import { sanitizeObject } from '../../lib/sanitize';
 import { revalidatePath } from 'next/cache';
 import { startOfDay, startOfWeek, isAfter, format } from 'date-fns';
+import { toErrorMessage } from '@/lib/errors';
 
 /**
  * Mutation function to log a new user activity. Calculates carbon emissions,
@@ -213,7 +214,7 @@ export async function logActivity(formData: {
     revalidatePath('/profile');
     return { success: true, emissions };
   } catch (error: unknown) {
-    console.error('[logActivity] Failed to log activity:', error);
+    console.error('[logActivity] Failed to log activity:', toErrorMessage(error));
     throw error;
   }
 }
@@ -279,7 +280,7 @@ export async function deleteActivity(id: string, uid: string): Promise<{ success
     revalidatePath('/profile');
     return { success: true };
   } catch (error: unknown) {
-    console.error('[deleteActivity] Failed to delete activity:', error);
+    console.error('[deleteActivity] Failed to delete activity:', toErrorMessage(error));
     throw error;
   }
 }

@@ -8,6 +8,7 @@ import {
   persistentMultipleTabManager,
 } from 'firebase/firestore';
 import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
+import { toErrorMessage } from '@/lib/errors';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -21,18 +22,26 @@ const firebaseConfig = {
 
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
+/**
+ * Auth constant.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
+ */
 export const auth: Auth = getAuth(app);
 
 /**
  * Firestore instance configured for standard caching.
  * Note: persistentLocalCache was removed because it causes uncatchable internal
  * assertion failures in the Firebase v10 SDK during Next.js Fast Refresh.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
  */
 export const db: Firestore = getFirestore(app);
 
 /**
  * Initializes and returns the Firebase Analytics instance on the client.
  * @returns A promise resolving to the Analytics instance, or null if unsupported.
+ * @throws {never} This function does not throw.
  */
 export async function getFirebaseAnalytics(): Promise<Analytics | null> {
   try {
@@ -40,7 +49,7 @@ export async function getFirebaseAnalytics(): Promise<Analytics | null> {
       return getAnalytics(app);
     }
   } catch (error: unknown) {
-    console.error('Firebase analytics initialization error:', error);
+    console.error('Firebase analytics initialization error:', toErrorMessage(error));
   }
   return null;
 }

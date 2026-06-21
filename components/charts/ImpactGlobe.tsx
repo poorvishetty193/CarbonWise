@@ -7,6 +7,13 @@ interface ImpactGlobeProps {
   kgSaved: number;
 }
 
+/**
+ *  Impact Globe function.
+ * @param props - Component properties.
+ * @param props.kgSaved - Semantic unit for kgSaved.
+ * @returns Shape or unit of the return value.
+ * @throws {never} This function does not throw.
+ */
 export default function ImpactGlobe({ kgSaved }: ImpactGlobeProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const treeCount = Math.max(Math.round(kgSaved / 22), 1);

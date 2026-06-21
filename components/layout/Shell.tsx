@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, PlusSquare, BarChart3, Trophy, User, MessageCircle, X } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { MobileNav } from './MobileNav';
 import { SkipToContent } from './SkipToContent';
 import { useAuthSession } from '../../lib/auth-context';
-import { logout } from '../../lib/logout';
 import { useIdleTimeout } from '../../hooks/useIdleTimeout';
+import { useStreamingInsights } from '../../hooks/useStreamingInsights';
+import { DesktopSidebar } from './DesktopSidebar';
+import { AiWhispererDrawer } from './AiWhispererDrawer';
+import { TopHeader } from './TopHeader';
 
 interface ShellProps {
   children: React.ReactNode;
@@ -24,55 +26,21 @@ interface ShellProps {
  * @throws {never} This component does not throw.
  */
 export function Shell({ children }: ShellProps): React.ReactElement {
-  const pathname = usePathname();
   const { uid, displayName } = useAuthSession();
   const [isWhispererOpen, setIsWhispererOpen] = useState(false);
-  const [aiResponse, setAiResponse] = useState<string>('');
-  const [aiLoading, setAiLoading] = useState(false);
+  
+  const { text: aiResponse, isStreaming: aiLoading, trigger: handleAskWhisperer } = useStreamingInsights(uid ?? '');
 
   // Auto-logout after 10 minutes of inactivity
   useIdleTimeout(10 * 60 * 1000, !!uid);
 
-  const navLinks = [
-    { href: '/', label: 'Overview', icon: Home },
-    { href: '/log', label: 'Log Activity', icon: PlusSquare },
-    { href: '/insights', label: 'AI Insights', icon: BarChart3 },
-    { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
-    { href: '/profile', label: 'My Profile', icon: User },
-  ];
-
-  /**
-   * Fetches real-time AI coach feedback from `/api/ai-insights`.
-   */
-  const handleAskWhisperer = async (): Promise<void> => {
-    setAiLoading(true);
-    setAiResponse('');
-    try {
-      const response = await fetch('/api/ai-insights', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          activitySummary: { transport: 120, food: 15, energy: 45, shopping: 22 },
-          weeklyBudgetKg: 150,
-        }),
-      });
-
-      if (!response.body) return;
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunkValue = decoder.decode(value);
-        setAiResponse((prev) => prev + chunkValue);
-      }
-    } catch (error: unknown) {
-      console.error('[Shell] AI Coach connection failed:', error);
-      setAiResponse('Could not connect to AI Coach. Please configure env credentials.');
-    } finally {
-      setAiLoading(false);
+  const toggleWhisperer = () => {
+    setIsWhispererOpen(!isWhispererOpen);
+    if (!isWhispererOpen && !aiResponse) {
+      handleAskWhisperer(
+        { transport: 120, food: 15, energy: 45, shopping: 22 },
+        150
+      );
     }
   };
 
@@ -80,71 +48,11 @@ export function Shell({ children }: ShellProps): React.ReactElement {
     <div className="min-h-screen bg-surface-soft text-slateBlue-900 font-sans flex flex-col">
       <SkipToContent />
 
-      {/* Top Header */}
-      <header className="sticky top-0 z-30 bg-forest-900 text-white px-4 h-16 flex items-center justify-between shadow-md">
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl font-display font-bold tracking-tight text-white">CarbonWise</span>
-          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-forest-700 text-forest-200">AR6 Sync</span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => {
-              setIsWhispererOpen(!isWhispererOpen);
-              if (!isWhispererOpen && !aiResponse) {
-                void handleAskWhisperer();
-              }
-            }}
-            aria-label="Toggle AI Whisperer"
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-forest-800 hover:bg-forest-700 text-white focus:outline-none focus:ring-2 focus:ring-amberAlert-500 transition-colors"
-          >
-            <MessageCircle className="w-5 h-5" />
-          </button>
-        </div>
-      </header>
+      <TopHeader onToggleWhisperer={toggleWhisperer} />
 
       {/* Sidebar & Main Area wrapper */}
       <div className="flex flex-1 relative">
-        {/* Desktop Sidebar */}
-        <aside className="hidden md:flex flex-col w-64 bg-white border-r border-surface-border p-4">
-          <nav className="space-y-1 flex-1">
-            {navLinks.map(({ href, label, icon: Icon }) => {
-              const isActive = pathname === href;
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
-                    isActive
-                      ? 'bg-forest-55 text-forest-700 font-semibold border-l-4 border-forest-600 bg-forest-50'
-                      : 'text-slateBlue-500 hover:bg-surface-soft hover:text-slateBlue-800'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Sidebar footer: user info + logout */}
-          <div className="mt-auto pt-4 border-t border-surface-border space-y-3">
-            {displayName && (
-              <div className="px-4 py-2">
-                <p className="text-xs text-slateBlue-400 font-sans">Signed in as</p>
-                <p className="text-sm font-semibold text-slateBlue-800 truncate">{displayName}</p>
-              </div>
-            )}
-            <button
-              id="sidebar-logout-btn"
-              onClick={() => void logout()}
-              className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-              aria-label="Log out"
-            >
-              <X className="w-5 h-5" />
-              <span>Log Out</span>
-            </button>
-          </div>
-        </aside>
+        <DesktopSidebar displayName={displayName} />
 
         {/* Main Content Area */}
         <main id="main-content" className="flex-1 p-4 md:p-8 pb-24 md:pb-8 focus:outline-none">
@@ -153,44 +61,12 @@ export function Shell({ children }: ShellProps): React.ReactElement {
           </div>
         </main>
 
-        {/* AI Whisperer Sidebar Panel */}
-        {isWhispererOpen && (
-          <aside className="fixed inset-y-16 right-0 z-40 w-80 bg-white border-l border-surface-border shadow-2xl flex flex-col animate-slide-up md:animate-none">
-            <div className="p-4 border-b border-surface-border flex items-center justify-between bg-forest-50">
-              <div className="flex items-center space-x-2">
-                <span className="text-xl">🌿</span>
-                <div>
-                  <h2 className="text-sm font-bold text-forest-900 font-display">AI Whisperer</h2>
-                  <p className="text-[10px] text-slateBlue-500 font-sans">Climate recommendations</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsWhispererOpen(false)}
-                aria-label="Close AI Whisperer"
-                className="text-slateBlue-500 hover:text-slateBlue-800 focus:outline-none"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="flex-1 p-4 overflow-y-auto space-y-4 text-sm leading-relaxed font-sans">
-              <div className="bg-forest-50 border border-forest-100 rounded-xl p-3 text-forest-900">
-                <p>Hello! I am your climate coach. I review your logs to provide personalized tips.</p>
-              </div>
-              {aiLoading && (
-                <div className="flex items-center space-x-2 text-slateBlue-500">
-                  <span className="animate-spin text-lg">⏳</span>
-                  <span>Consulting factors...</span>
-                </div>
-              )}
-              {aiResponse && (
-                <div className="bg-white border border-surface-border rounded-xl p-3 text-slateBlue-850 whitespace-pre-line">
-                  {aiResponse}
-                </div>
-              )}
-            </div>
-          </aside>
-        )}
+        <AiWhispererDrawer
+          isOpen={isWhispererOpen}
+          onClose={() => setIsWhispererOpen(false)}
+          aiLoading={aiLoading}
+          aiResponse={aiResponse}
+        />
       </div>
 
       <MobileNav />

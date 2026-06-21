@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calculateEmissions } from '../../../lib/carbon-calculator';
 import { ActivityCategory } from '../../../types';
 import { isRateLimited } from '../../../lib/rate-limit';
+import { toErrorMessage } from '@/lib/errors';
 
 /**
  * POST /api/carbon-score
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const emissions = calculateEmissions(category as ActivityCategory, subcategory, amount);
     return NextResponse.json({ emissions });
   } catch (error: unknown) {
-    console.error('[carbon-score/route] Calculation failed:', error);
+    console.error('[carbon-score/route] Calculation failed:', toErrorMessage(error));
     const message = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json({ error: message }, { status: 500 });
   }

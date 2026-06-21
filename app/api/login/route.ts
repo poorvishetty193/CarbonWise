@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth } from '../../../lib/firebase/admin';
 import { isRateLimited } from '../../../lib/rate-limit';
+import { toErrorMessage } from '@/lib/errors';
 
 /** Cookie name must match next-firebase-auth-edge middleware cookieName. */
 const COOKIE_NAME = 'AuthToken';
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return response;
   } catch (error: unknown) {
-    console.error('[login/route] Session cookie creation failed:', error);
+    console.error('[login/route] Session cookie creation failed:', toErrorMessage(error));
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }

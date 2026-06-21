@@ -33,6 +33,8 @@ interface AuthProviderProps {
  * @param props.value - Decoded session data passed from the Server Component layout.
  * @param props.children - Child components.
  * @returns Context provider wrapper.
+ * @param props - Component properties.
+ * @throws {never} This function does not throw.
  */
 export function AuthProvider({ value, children }: AuthProviderProps): React.ReactElement {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -42,6 +44,7 @@ export function AuthProvider({ value, children }: AuthProviderProps): React.Reac
  * Returns the authenticated session context.
  * Must be used inside a component wrapped by <AuthProvider>.
  * @returns AuthSessionContext with uid, displayName, email, photoURL.
+ * @throws {never} This function does not throw.
  */
 export function useAuthSession(): AuthSessionContext {
   return useContext(AuthContext);

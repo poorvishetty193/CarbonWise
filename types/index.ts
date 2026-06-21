@@ -113,3 +113,12 @@ export interface ActivitySummary {
   energy: number;
   shopping: number;
 }
+
+export type ActivityLogResult =
+  | { success: true; activityId: string; kgCO2e: number }
+  | { success: false; error: string };
+
+export type InsightResult =
+  | { status: 'streaming'; partialText: string }
+  | { status: 'complete'; text: string; savedAt?: string }
+  | { status: 'error'; message: string };

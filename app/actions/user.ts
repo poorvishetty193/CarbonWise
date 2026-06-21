@@ -3,6 +3,7 @@
 import { getAdminDb } from '../../lib/firebase/admin';
 import { sanitizeObject } from '../../lib/sanitize';
 import { revalidatePath } from 'next/cache';
+import { toErrorMessage } from '@/lib/errors';
 
 /**
  * Mutation function to create or update a user's profile document in Firestore.
@@ -59,7 +60,7 @@ export async function createOrUpdateProfile(profile: {
     revalidatePath('/profile');
     return { success: true };
   } catch (error: unknown) {
-    console.error('[createOrUpdateProfile] Failed to update user profile:', error);
+    console.error('[createOrUpdateProfile] Failed to update user profile:', toErrorMessage(error));
     throw error;
   }
 }
@@ -92,7 +93,7 @@ export async function awardBadge(uid: string, badgeId: string): Promise<{ succes
     revalidatePath('/profile');
     return { success: true };
   } catch (error: unknown) {
-    console.error('[awardBadge] Failed to award badge:', error);
+    console.error('[awardBadge] Failed to award badge:', toErrorMessage(error));
     throw error;
   }
 }

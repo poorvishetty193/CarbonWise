@@ -15,6 +15,7 @@ interface State {
  * Captures React runtime errors and renders a fallback view.
  * 
  * @throws {never} This component itself handles exceptions to prevent layout crash.
+ * @returns Instance of the class.
  */
 export class ErrorBoundary extends Component<Props, State> {
   public override state: State = {

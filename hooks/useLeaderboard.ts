@@ -1,6 +1,7 @@
+import { toErrorMessage } from '../lib/errors';
 import { useState, useEffect } from 'react';
-import { db } from '../lib/firebase/client';
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { subscribeToLeaderboard } from '../lib/firebase/repositories';
+
 import { LeaderboardEntry } from '../types';
 
 /**
@@ -9,6 +10,7 @@ import { LeaderboardEntry } from '../types';
  *
  * @param topN - Maximum number of users to return (default 20).
  * @returns Object holding ranked entries, loading state, and any error.
+ * @throws {never} This function does not throw.
  */
 export function useLeaderboard(topN = 20): {
   entries: LeaderboardEntry[];
@@ -20,39 +22,18 @@ export function useLeaderboard(topN = 20): {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const q = query(
-      collection(db, 'users'),
-      orderBy('valueKg', 'desc'),
-      limit(topN)
-    );
-
     let unsubscribe: () => void = () => {};
 
     try {
-      unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          const items: LeaderboardEntry[] = [];
-          snapshot.forEach((doc) => {
-            const data = doc.data();
-            items.push({
-              uid: doc.id,
-              displayName: data.displayName || 'Anonymous',
-              photoURL: data.photoURL ?? undefined,
-              weeklyKgSaved: typeof data.totalKgSaved === 'number' ? data.totalKgSaved : 0,
-              rank: 0, // assigned below
-            });
-          });
-
-          // Assign ranks after sort is already applied by Firestore
-          items.forEach((item, i) => { item.rank = i + 1; });
-
+      unsubscribe = subscribeToLeaderboard(
+        topN,
+        (items) => {
           setEntries(items);
           setError(null);
           setLoading(false);
         },
         (err) => {
-          console.error('[useLeaderboard] Firestore error:', err);
+          console.error('[useLeaderboard] Firestore error:', toErrorMessage(err));
           setError('Could not load leaderboard. Check Firestore indexes.');
           setLoading(false);
         }

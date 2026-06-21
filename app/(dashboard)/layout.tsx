@@ -6,6 +6,7 @@ import { AuthProvider } from '../../lib/auth-context';
 import { PageTransition } from '../../components/layout/PageTransition';
 
 import type { AuthSessionContext } from '../../lib/auth-context';
+import { toErrorMessage } from '@/lib/errors';
 
 export const dynamicParams = true;
 export const dynamic = 'force-dynamic';
@@ -58,7 +59,7 @@ export default async function DashboardLayout({
       };
     }
   } catch (error: unknown) {
-    console.error('[DashboardLayout] Failed to decode session token:', error);
+    console.error('[DashboardLayout] Failed to decode session token:', toErrorMessage(error));
   }
 
   return (

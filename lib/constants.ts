@@ -3,6 +3,8 @@ import { ActivityCategory } from '../types';
 /**
  * Standard carbon emission coefficients based on IPCC AR6 guidelines.
  * Units: kg CO2e per corresponding unit (e.g., km, kg, kWh).
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
  */
 export const EMISSION_FACTORS: Record<ActivityCategory, Record<string, number>> = {
   transport: {
@@ -35,6 +37,8 @@ export const EMISSION_FACTORS: Record<ActivityCategory, Record<string, number>> 
 
 /**
  * Gamification achievements definitions.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
  */
 export const BADGE_DEFINITIONS = [
   { id: 'first_log', title: 'Carbon Pioneer', description: 'Log your first daily activity', icon: '🌱' },
@@ -46,6 +50,8 @@ export const BADGE_DEFINITIONS = [
 
 /**
  * Color mappings for styling and UI display.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
  */
 export const CATEGORY_COLORS: Record<ActivityCategory, string> = {
   transport: '#4B6B88',
@@ -56,6 +62,8 @@ export const CATEGORY_COLORS: Record<ActivityCategory, string> = {
 
 /**
  * Routing constants to maintain link safety.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
  */
 export const ROUTES = {
   HOME: '/',
@@ -69,6 +77,8 @@ export const ROUTES = {
 
 /**
  * Internal API endpoints mapping.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
  */
 export const API_ENDPOINTS = {
   CARBON_SCORE: '/api/carbon-score',
@@ -80,6 +90,8 @@ export const API_ENDPOINTS = {
 
 /**
  * Google Analytics and tracking events registry.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
  */
 export const ANALYTICS_EVENTS = {
   ACTIVITY_LOGGED: 'activity_logged',
@@ -92,3 +104,17 @@ export const ANALYTICS_EVENTS = {
   ONBOARDING_COMPLETED: 'onboarding_completed',
   CHALLENGE_JOINED: 'challenge_joined',
 } as const;
+
+/**
+ *  E R R O R_ M E S S A G E S constant.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
+ */
+export const ERROR_MESSAGES = {
+  UNKNOWN_ERROR: 'An unknown error occurred',
+  GENERIC_FAILURE: 'Something went wrong. Please try again.',
+  ACTIVITY_LOG_FAILED: 'Failed to log activity. Please try again.',
+  INSIGHTS_UNAVAILABLE: 'AI insights are temporarily unavailable.',
+  RATE_LIMITED: 'Too many requests. Please wait a moment.',
+  AUTH_REQUIRED: 'You must be signed in to do that.',
+} as const satisfies Record<string, string>;

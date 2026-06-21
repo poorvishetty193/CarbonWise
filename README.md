@@ -198,12 +198,12 @@ The Profile page allows users to set a weekly carbon budget (kg CO₂e/week), vi
 
 ```
 app/(dashboard)/[page]/page.tsx       →  Server Component (metadata + auth boundary)
-                                               ↓
+                                             ↓
 components/[page]/[Page]Client.tsx    →  Client Component (state, effects, real-time)
-                                               ↓
-hooks/use[Feature].ts                 →  Custom hook (Firestore subscription / API call)
-                                               ↓
-lib/                                  →  Pure logic (calculator, sanitize, rate-limit)
+                                             ↓
+hooks/use[Feature].ts                 →  Custom hook (encapsulating state & logic)
+                                             ↓
+lib/firebase/repositories.ts          →  Firestore Repository (isolated data access)
 ```
 
 ### Firestore Security Model
@@ -397,10 +397,12 @@ npx tsc --noEmit && npm run lint && npm test && npm run build
 | Standard | Implementation |
 |---|---|
 | **Zero `any` types** | All interfaces defined in `types/index.ts`; `unknown` + type guards used throughout |
-| **Typed catch blocks** | `catch (error: unknown)` with `error instanceof Error` guard on every catch |
-| **JSDoc on all exports** | Every function in `lib/` and all API route handlers documented |
+| **Centralized Errors** | All caught errors go through `toErrorMessage()` in `lib/errors.ts` for safe stringification |
+| **Strict JSDoc** | Every export in `components/`, `hooks/`, `lib/` has detailed `@param`, `@returns`, and `@throws` rules |
 | **Constants file** | No magic strings — emission factors, routes, events, API paths all in `lib/constants.ts` |
-| **Custom hooks** | All stateful logic extracted: `useActivityLog`, `useCarbonBudget`, `useLeaderboard`, `useRealtimeScore`, `useUserStreak` |
+| **Custom hooks** | Logic is fully extracted into hooks: `useActivityFormState`, `useStreamingInsights`, etc. |
+| **Component Size Limit**| No `.tsx` component file exceeds a strict 150-line limit to guarantee maintainability |
+| **Firebase Abstraction**| UI never calls `getFirestore` directly; all data access passes via `repositories.ts` |
 | **Named exports only** | All components and lib functions use named exports (except Next.js `default` page exports) |
 | **Return types** | All `async` functions have explicit `Promise<T>` return types |
 | **No `console.log`** | Only `console.error` in catch blocks of API routes |

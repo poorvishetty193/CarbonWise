@@ -1,6 +1,7 @@
+import { toErrorMessage } from '../lib/errors';
 import { useState, useEffect } from 'react';
-import { db } from '../lib/firebase/client';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { subscribeToUserProfile } from '../lib/firebase/repositories';
+
 import { UserProfile } from '../types';
 
 /**
@@ -26,20 +27,14 @@ export function useUserStreak(uid: string | undefined): {
       setLoading(false);
       return;
     }
-
-    const docRef = doc(db, 'users', uid);
     let unsubscribe: () => void = () => {};
 
     try {
-      unsubscribe = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
-        } else {
-          setProfile(null);
-        }
+      unsubscribe = subscribeToUserProfile(uid, (profileData) => {
+        setProfile(profileData);
         setLoading(false);
       }, (error: unknown) => {
-        console.error("Error fetching user profile for streak", error);
+        console.error("Error fetching user profile for streak", toErrorMessage(error));
         setLoading(false);
       });
     } catch (e: any) {

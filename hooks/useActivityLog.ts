@@ -1,6 +1,7 @@
+import { toErrorMessage } from '../lib/errors';
 import { useState, useEffect } from 'react';
-import { db } from '../lib/firebase/client';
-import { collection, query, where, limit, onSnapshot } from 'firebase/firestore';
+import { subscribeToActivities } from '../lib/firebase/repositories';
+
 import { ActivityLog } from '../types';
 
 /**
@@ -24,27 +25,14 @@ export function useActivityLog(uid: string | undefined, limitCount: number = 50)
       setLoading(false);
       return;
     }
-
-    const q = query(
-      collection(db, 'activities'),
-      where('uid', '==', uid),
-      limit(limitCount)
-    );
-
     let unsubscribe: () => void = () => {};
 
     try {
-      unsubscribe = onSnapshot(q, (snapshot) => {
-        const items: ActivityLog[] = [];
-        snapshot.forEach((doc) => {
-          items.push({ id: doc.id, ...doc.data() } as ActivityLog);
-        });
-        // Sort newest-first client-side (avoids needing a composite Firestore index)
-        items.sort((a, b) => new Date(b.loggedAt).getTime() - new Date(a.loggedAt).getTime());
+      unsubscribe = subscribeToActivities(uid, limitCount, (items) => {
         setActivities(items);
         setLoading(false);
       }, (error: unknown) => {
-        console.error("Error fetching activities", error);
+        console.error("Error fetching activities", toErrorMessage(error));
         setLoading(false);
       });
     } catch (e: any) {

@@ -5,6 +5,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
+/**
+ *  Input constant.
+ * @returns The shape or unit of this constant object.
+ * @throws {never} This constant does not throw.
+ */
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, className = '', ...props }, ref) => {
     return (

@@ -23,6 +23,7 @@ interface CategoryOption {
  * @param props.selected Current active selected category.
  * @param props.onChange Callback fired on changing selection.
  * @returns An animated button grid component.
+ * @throws {never} This function does not throw.
  */
 export function CategoryPicker({ selected, onChange }: CategoryPickerProps): ReactElement {
   const categories: CategoryOption[] = [

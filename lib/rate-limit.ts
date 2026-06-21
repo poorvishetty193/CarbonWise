@@ -6,6 +6,7 @@ const cache = new Map<string, { count: number; expiresAt: number }>();
  * @param limit Allowed transactions boundary per window. Default 10.
  * @param windowMs Expiration interval length in milliseconds. Default 60000 (1 min).
  * @returns Boolean representing if the caller is blocked.
+ * @throws {never} This function does not throw.
  */
 export function isRateLimited(key: string, limit = 10, windowMs = 60000): boolean {
   const now = Date.now();

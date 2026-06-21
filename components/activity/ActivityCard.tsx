@@ -16,6 +16,7 @@ interface ActivityCardProps {
  * @param props.activity Loaded activity item document.
  * @param props.onDelete Callback event firing delete mutations.
  * @returns React element box.
+ * @throws {never} This function does not throw.
  */
 export function ActivityCard({ activity, onDelete }: ActivityCardProps): ReactElement {
   const icons = {

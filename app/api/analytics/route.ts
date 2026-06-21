@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isRateLimited } from '../../../lib/rate-limit';
+import { toErrorMessage } from '@/lib/errors';
 
 /**
  * POST /api/analytics
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    console.error('[analytics/route] Failed to parse analytics event:', error);
+    console.error('[analytics/route] Failed to parse analytics event:', toErrorMessage(error));
     const message = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json({ error: message }, { status: 500 });
   }

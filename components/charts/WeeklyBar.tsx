@@ -20,6 +20,7 @@ interface WeeklyBarProps {
  * @param props Component parameters.
  * @param props.data Loaded weekly activity aggregates grouped by category.
  * @returns React element.
+ * @throws {never} This function does not throw.
  */
 export default function WeeklyBar({ data }: WeeklyBarProps): ReactElement {
   /**
